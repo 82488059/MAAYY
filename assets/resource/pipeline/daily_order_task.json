@@ -12,8 +12,8 @@
             "号令_定位匹配中",
             "号令_点开始匹配",
             "号令_点前往",
-            "号令_业火已领完",
             "号令_业火可领奖",
+            "号令_业火已领完",
             "号令_见业火焚身",
             "号令_等号令页",
             "号令_已开功能菜单",
@@ -158,12 +158,12 @@
     },
     "号令_查找业火": {
         "attach": {
-            "description": "已领完(变灰有参与文案)→结束；可领奖(金色+图标)→点图标；否则点未完成业火进详情"
+            "description": "可领奖(金色)→点图标；见业火后先排除卡内仍有刷新(未完成)；无刷新才算领完回主界面"
         },
         "action": "DoNothing",
         "next": [
-            "号令_业火已领完",
             "号令_业火可领奖",
+            "号令_业火已领完",
             "号令_见业火焚身"
         ],
         "timeout": 5000,
@@ -174,7 +174,32 @@
     },
     "号令_业火已领完": {
         "attach": {
-            "description": "领奖后业火变灰，标题下出现「参与…觉障林」文案：任务真正结束"
+            "description": "见业火后复核：卡内右上仍有刷新=未完成去点详情；无刷新=已领完变灰，回主界面。勿用「参与觉障」文案（未完成也有）"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "业火焚身",
+            "业火"
+        ],
+        "roi": [
+            100,
+            240,
+            1100,
+            320
+        ],
+        "threshold": 0.5,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "号令_业火领完确认无刷新"
+        ],
+        "timeout": 2500,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "号令_业火领完确认无刷新": {
+        "attach": {
+            "description": "业火卡右上角刷新（专用深色模板）：有=未完成→点详情；无=已领完→回主界面"
         },
         "recognition": "And",
         "all_of": [
@@ -194,25 +219,63 @@
                 "sub_name": "yehuo"
             },
             {
-                "recognition": "OCR",
-                "expected": [
-                    "参与",
-                    "觉障林",
-                    "觉障"
-                ],
+                "recognition": "TemplateMatch",
+                "template": "daily_order/refresh_yehuo.png",
                 "roi": "yehuo",
                 "roi_offset": [
-                    -40,
-                    20,
-                    260,
-                    90
+                    90,
+                    -55,
+                    180,
+                    110
                 ],
-                "threshold": 0.4
+                "threshold": 0.88
             }
         ],
-        "box_index": 0,
         "action": "DoNothing",
-        "post_delay": 200,
+        "post_delay": 100,
+        "next": [
+            "号令_见业火焚身"
+        ],
+        "timeout": 2000,
+        "rate_limit": 300,
+        "on_error": [
+            "号令_领完回主界面"
+        ]
+    },
+    "号令_领完回主界面": {
+        "attach": {
+            "description": "领完后点右上返回，直到主菜单再结束"
+        },
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "号令_领完见主菜单",
+            "号令_领完点返回"
+        ],
+        "timeout": 20000,
+        "rate_limit": 400,
+        "on_error": [
+            "每日号令_结束"
+        ]
+    },
+    "号令_领完见主菜单": {
+        "attach": {
+            "description": "已回主界面（右上主菜单）"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/main_menu.png",
+            "storage/主菜单.png"
+        ],
+        "roi": [
+            1080,
+            0,
+            200,
+            90
+        ],
+        "threshold": 0.75,
+        "action": "DoNothing",
+        "post_delay": 300,
         "next": [
             "每日号令_结束"
         ],
@@ -220,9 +283,60 @@
         "rate_limit": 300,
         "on_error": []
     },
+    "号令_领完点返回": {
+        "attach": {
+            "description": "号令/门派页右上「«」返回，可连点直到主菜单"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/back.png",
+            "medicine/返回.png"
+        ],
+        "roi": [
+            1100,
+            0,
+            180,
+            90
+        ],
+        "threshold": 0.65,
+        "action": "Click",
+        "post_delay": 1200,
+        "max_hit": 6,
+        "next": [
+            "号令_领完见主菜单",
+            "号令_领完点返回"
+        ],
+        "timeout": 5000,
+        "rate_limit": 350,
+        "on_error": [
+            "号令_领完点返回坐标",
+            "号令_领完见主菜单"
+        ]
+    },
+    "号令_领完点返回坐标": {
+        "attach": {
+            "description": "模板未中时点右上返回坐标"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1220,
+            28
+        ],
+        "post_delay": 1200,
+        "max_hit": 4,
+        "next": [
+            "号令_领完见主菜单",
+            "号令_领完点返回"
+        ],
+        "timeout": 3000,
+        "on_error": [
+            "每日号令_结束"
+        ]
+    },
     "号令_业火可领奖": {
         "attach": {
-            "description": "业火金色高亮且待领：先认高亮，再点标题下两个领奖图标"
+            "description": "业火可领：须同时见金色高亮与领奖图标，避免未完成卡被 ColorMatch 误判进领奖"
         },
         "recognition": "And",
         "all_of": [
@@ -263,6 +377,21 @@
                     280,
                     160
                 ]
+            },
+            {
+                "recognition": "TemplateMatch",
+                "template": [
+                    "daily_order/claim_icon.png",
+                    "daily_order/claim_icon_num.png"
+                ],
+                "roi": "yehuo",
+                "roi_offset": [
+                    -30,
+                    25,
+                    220,
+                    100
+                ],
+                "threshold": 0.7
             }
         ],
         "box_index": 0,
@@ -417,7 +546,7 @@
         "rate_limit": 400,
         "on_error": [
             "号令_业火已领完",
-            "每日号令_结束"
+            "号令_领完回主界面"
         ]
     },
     "号令_领奖点确定": {
@@ -514,12 +643,12 @@
         "max_hit": 2,
         "next": [
             "号令_业火已领完",
-            "每日号令_结束"
+            "号令_领完回主界面"
         ],
         "timeout": 2000,
         "on_error": [
             "号令_业火已领完",
-            "每日号令_结束"
+            "号令_领完回主界面"
         ]
     },
     "号令_业火已完成": {
@@ -559,22 +688,53 @@
             "号令_检查刷新"
         ]
     },
-    "号令_检查刷新": {
+    "号令_找刷新": {
         "attach": {
-            "description": "无业火时：有刷新则点齐；无刷新作兜底结束（完成态优先看业火已领完）"
+            "description": "供 Agent 覆盖 index：TemplateMatch refresh_user"
         },
         "recognition": "TemplateMatch",
-        "template": [
-            "daily_order/refresh.png",
-            "daily_order/refresh_dark.png"
+        "template": "daily_order/refresh_user.png",
+        "roi": [
+            100,
+            230,
+            1150,
+            320
+        ],
+        "threshold": 0.88,
+        "order_by": "Vertical",
+        "index": 0,
+        "action": "DoNothing"
+    },
+    "号令_读刷新标签": {
+        "attach": {
+            "description": "供 Agent 覆盖 ROI：读卡内标签名（相对刷新同构业火焚身）"
+        },
+        "recognition": "OCR",
+        "expected": [
+            ".*"
         ],
         "roi": [
-            380,
-            230,
-            820,
-            220
+            100,
+            240,
+            200,
+            80
         ],
-        "threshold": 0.9,
+        "threshold": 0.35,
+        "action": "DoNothing"
+    },
+    "号令_检查刷新": {
+        "attach": {
+            "description": "无业火时：浅色 refresh_user 点齐；标签名验签见文档/Agent 可选动作，默认直接点"
+        },
+        "recognition": "TemplateMatch",
+        "template": "daily_order/refresh_user.png",
+        "roi": [
+            100,
+            230,
+            1150,
+            320
+        ],
+        "threshold": 0.88,
         "action": "DoNothing",
         "post_delay": 200,
         "next": [
@@ -593,20 +753,17 @@
     },
     "号令_点刷新0": {
         "attach": {
-            "description": "点第1枚刷新（Vertical index 0）；后续档位写在 next 里以便跳过"
+            "description": "点第1枚刷新（Vertical index 0）"
         },
         "recognition": "TemplateMatch",
-        "template": [
-            "daily_order/refresh.png",
-            "daily_order/refresh_dark.png"
-        ],
+        "template": "daily_order/refresh_user.png",
         "roi": [
-            380,
+            100,
             230,
-            820,
-            220
+            1150,
+            320
         ],
-        "threshold": 0.9,
+        "threshold": 0.88,
         "order_by": "Vertical",
         "index": 0,
         "action": "Click",
@@ -639,20 +796,17 @@
     },
     "号令_点刷新1": {
         "attach": {
-            "description": "点第2枚刷新（Vertical index 1）；后续档位写在 next 里以便跳过"
+            "description": "点第2枚刷新（Vertical index 1）"
         },
         "recognition": "TemplateMatch",
-        "template": [
-            "daily_order/refresh.png",
-            "daily_order/refresh_dark.png"
-        ],
+        "template": "daily_order/refresh_user.png",
         "roi": [
-            380,
+            100,
             230,
-            820,
-            220
+            1150,
+            320
         ],
-        "threshold": 0.9,
+        "threshold": 0.88,
         "order_by": "Vertical",
         "index": 1,
         "action": "Click",
@@ -684,20 +838,17 @@
     },
     "号令_点刷新2": {
         "attach": {
-            "description": "点第3枚刷新（Vertical index 2）；后续档位写在 next 里以便跳过"
+            "description": "点第3枚刷新（Vertical index 2）"
         },
         "recognition": "TemplateMatch",
-        "template": [
-            "daily_order/refresh.png",
-            "daily_order/refresh_dark.png"
-        ],
+        "template": "daily_order/refresh_user.png",
         "roi": [
-            380,
+            100,
             230,
-            820,
-            220
+            1150,
+            320
         ],
-        "threshold": 0.9,
+        "threshold": 0.88,
         "order_by": "Vertical",
         "index": 2,
         "action": "Click",
@@ -728,20 +879,17 @@
     },
     "号令_点刷新3": {
         "attach": {
-            "description": "点第4枚刷新（Vertical index 3）；后续档位写在 next 里以便跳过"
+            "description": "点第4枚刷新（Vertical index 3）"
         },
         "recognition": "TemplateMatch",
-        "template": [
-            "daily_order/refresh.png",
-            "daily_order/refresh_dark.png"
-        ],
+        "template": "daily_order/refresh_user.png",
         "roi": [
-            380,
+            100,
             230,
-            820,
-            220
+            1150,
+            320
         ],
-        "threshold": 0.9,
+        "threshold": 0.88,
         "order_by": "Vertical",
         "index": 3,
         "action": "Click",
@@ -771,20 +919,17 @@
     },
     "号令_点刷新4": {
         "attach": {
-            "description": "点第5枚刷新（Vertical index 4）；后续档位写在 next 里以便跳过"
+            "description": "点第5枚刷新（Vertical index 4）"
         },
         "recognition": "TemplateMatch",
-        "template": [
-            "daily_order/refresh.png",
-            "daily_order/refresh_dark.png"
-        ],
+        "template": "daily_order/refresh_user.png",
         "roi": [
-            380,
+            100,
             230,
-            820,
-            220
+            1150,
+            320
         ],
-        "threshold": 0.9,
+        "threshold": 0.88,
         "order_by": "Vertical",
         "index": 4,
         "action": "Click",
@@ -813,20 +958,17 @@
     },
     "号令_点刷新5": {
         "attach": {
-            "description": "点第6枚刷新（Vertical index 5）；后续档位写在 next 里以便跳过"
+            "description": "点第6枚刷新（Vertical index 5）"
         },
         "recognition": "TemplateMatch",
-        "template": [
-            "daily_order/refresh.png",
-            "daily_order/refresh_dark.png"
-        ],
+        "template": "daily_order/refresh_user.png",
         "roi": [
-            380,
+            100,
             230,
-            820,
-            220
+            1150,
+            320
         ],
-        "threshold": 0.9,
+        "threshold": 0.88,
         "order_by": "Vertical",
         "index": 5,
         "action": "Click",
@@ -854,7 +996,7 @@
     },
     "每日号令_结束": {
         "attach": {
-            "description": "业火领奖变灰后，或无业火且无刷新：正常结束"
+            "description": "已回主界面，或兜底结束"
         },
         "action": "DoNothing",
         "next": []
@@ -893,6 +1035,8 @@
         "timeout": 15000,
         "rate_limit": 400,
         "on_error": [
+            "号令_见业火焚身",
+            "号令_查找业火",
             "每日号令_结束失败"
         ]
     },

@@ -8,6 +8,7 @@ import my_reco
 import alchemy_action
 import tiangong_action
 import moneybag_action
+import daily_order_action
 import debug_action
 
 
