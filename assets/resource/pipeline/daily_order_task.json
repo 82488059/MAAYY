@@ -1,0 +1,460 @@
+{
+    "每日号令": {
+        "attach": {
+            "description": "入口。主界面打开菜单→门派→江湖号令，找业火焚身；没有则先认刷新，有则点齐全部刷新再找"
+        },
+        "action": "DoNothing",
+        "next": [
+            "号令_已开功能菜单"
+        ],
+        "timeout": 3000,
+        "on_error": [
+            "每日号令_结束失败"
+        ]
+    },
+    "号令_已开功能菜单": {
+        "attach": {
+            "description": "功能菜单已开（能看到门派）：不再点主菜单，避免关掉"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "^门派$",
+            "门派"
+        ],
+        "order_by": "Expected",
+        "roi": [
+            800,
+            80,
+            480,
+            640
+        ],
+        "threshold": 0.45,
+        "action": "DoNothing",
+        "post_delay": 300,
+        "next": [
+            "号令_点门派"
+        ],
+        "timeout": 1200,
+        "rate_limit": 300,
+        "on_error": [
+            "号令_点主菜单"
+        ]
+    },
+    "号令_点主菜单": {
+        "attach": {
+            "description": "点右上角主菜单，只点一次"
+        },
+        "recognition": "TemplateMatch",
+        "template": "storage/主菜单.png",
+        "roi": [
+            1080,
+            0,
+            200,
+            90
+        ],
+        "threshold": 0.85,
+        "action": "Click",
+        "post_delay": 1200,
+        "max_hit": 1,
+        "next": [
+            "号令_点门派"
+        ],
+        "timeout": 4000,
+        "on_error": [
+            "每日号令_结束失败"
+        ]
+    },
+    "号令_点门派": {
+        "attach": {
+            "description": "功能菜单点门派，只点一次"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "^门派$",
+            "门派"
+        ],
+        "order_by": "Expected",
+        "roi": [
+            800,
+            80,
+            480,
+            640
+        ],
+        "threshold": 0.45,
+        "action": "Click",
+        "post_delay": 1500,
+        "max_hit": 1,
+        "next": [
+            "号令_点江湖号令"
+        ],
+        "timeout": 5000,
+        "on_error": [
+            "每日号令_结束失败"
+        ]
+    },
+    "号令_点江湖号令": {
+        "attach": {
+            "description": "门派页点江湖号令，只点一次"
+        },
+        "recognition": "OCR",
+        "expected": "江湖号令",
+        "roi": [
+            80,
+            60,
+            1120,
+            620
+        ],
+        "threshold": 0.45,
+        "action": "Click",
+        "post_delay": 1500,
+        "max_hit": 1,
+        "next": [
+            "号令_等号令页"
+        ],
+        "timeout": 8000,
+        "on_error": [
+            "每日号令_结束失败"
+        ]
+    },
+    "号令_等号令页": {
+        "attach": {
+            "description": "左上角标题出现「号」/「号令」才算打开，再进入查找循环"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "号令",
+            "^号$"
+        ],
+        "order_by": "Expected",
+        "roi": [
+            90,
+            0,
+            90,
+            60
+        ],
+        "threshold": 0.7,
+        "action": "DoNothing",
+        "post_delay": 400,
+        "next": [
+            "号令_查找业火"
+        ],
+        "timeout": 8000,
+        "on_error": [
+            "每日号令_结束失败"
+        ]
+    },
+    "号令_查找业火": {
+        "attach": {
+            "description": "轮询业火；没有则检查是否还有刷新按钮"
+        },
+        "action": "DoNothing",
+        "next": [
+            "号令_见业火焚身"
+        ],
+        "timeout": 4444,
+        "rate_limit": 400,
+        "on_error": [
+            "号令_检查刷新"
+        ]
+    },
+    "号令_见业火焚身": {
+        "attach": {
+            "description": "认到业火焚身则停，不点击"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "业火焚身",
+            "业火"
+        ],
+        "roi": [
+            100,
+            240,
+            1100,
+            320
+        ],
+        "threshold": 0.7,
+        "action": "DoNothing",
+        "next": [],
+        "on_error": []
+    },
+    "号令_检查刷新": {
+        "attach": {
+            "description": "有无刷新按钮。没有说明号令已刷完/已完成，正常结束；有则点齐全部"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/refresh.png",
+            "daily_order/refresh_dark.png"
+        ],
+        "roi": [
+            380,
+            230,
+            820,
+            220
+        ],
+        "threshold": 0.9,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "号令_点刷新0"
+        ],
+        "timeout": 1500,
+        "on_error": [
+            "每日号令_结束"
+        ]
+    },
+    "号令_点刷新0": {
+        "attach": {
+            "description": "点第1枚刷新（Vertical index 0）；没有则跳过点下一枚"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/refresh.png",
+            "daily_order/refresh_dark.png"
+        ],
+        "roi": [
+            380,
+            230,
+            820,
+            220
+        ],
+        "threshold": 0.9,
+        "order_by": "Vertical",
+        "index": 0,
+        "action": "Click",
+        "post_wait_freezes": {
+            "time": 400,
+            "timeout": 2500,
+            "rate_limit": 100,
+            "target": [
+                100,
+                240,
+                1100,
+                320
+            ],
+            "threshold": 0.95
+        },
+        "post_delay": 300,
+        "next": [
+            "号令_点刷新1"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "号令_点刷新1"
+        ]
+    },
+    "号令_点刷新1": {
+        "attach": {
+            "description": "点第2枚刷新；没有则跳过点下一枚"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/refresh.png",
+            "daily_order/refresh_dark.png"
+        ],
+        "roi": [
+            380,
+            230,
+            820,
+            220
+        ],
+        "threshold": 0.9,
+        "order_by": "Vertical",
+        "index": 1,
+        "action": "Click",
+        "post_wait_freezes": {
+            "time": 400,
+            "timeout": 2500,
+            "rate_limit": 100,
+            "target": [
+                100,
+                240,
+                1100,
+                320
+            ],
+            "threshold": 0.95
+        },
+        "post_delay": 300,
+        "next": [
+            "号令_点刷新2"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "号令_点刷新2"
+        ]
+    },
+    "号令_点刷新2": {
+        "attach": {
+            "description": "点第3枚刷新；没有则跳过点下一枚"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/refresh.png",
+            "daily_order/refresh_dark.png"
+        ],
+        "roi": [
+            380,
+            230,
+            820,
+            220
+        ],
+        "threshold": 0.9,
+        "order_by": "Vertical",
+        "index": 2,
+        "action": "Click",
+        "post_wait_freezes": {
+            "time": 400,
+            "timeout": 2500,
+            "rate_limit": 100,
+            "target": [
+                100,
+                240,
+                1100,
+                320
+            ],
+            "threshold": 0.95
+        },
+        "post_delay": 300,
+        "next": [
+            "号令_点刷新3"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "号令_点刷新3"
+        ]
+    },
+    "号令_点刷新3": {
+        "attach": {
+            "description": "点第4枚刷新；没有则跳过点下一枚"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/refresh.png",
+            "daily_order/refresh_dark.png"
+        ],
+        "roi": [
+            380,
+            230,
+            820,
+            220
+        ],
+        "threshold": 0.9,
+        "order_by": "Vertical",
+        "index": 3,
+        "action": "Click",
+        "post_wait_freezes": {
+            "time": 400,
+            "timeout": 2500,
+            "rate_limit": 100,
+            "target": [
+                100,
+                240,
+                1100,
+                320
+            ],
+            "threshold": 0.95
+        },
+        "post_delay": 300,
+        "next": [
+            "号令_点刷新4"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "号令_点刷新4"
+        ]
+    },
+    "号令_点刷新4": {
+        "attach": {
+            "description": "点第5枚刷新；没有则跳过点下一枚"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/refresh.png",
+            "daily_order/refresh_dark.png"
+        ],
+        "roi": [
+            380,
+            230,
+            820,
+            220
+        ],
+        "threshold": 0.9,
+        "order_by": "Vertical",
+        "index": 4,
+        "action": "Click",
+        "post_wait_freezes": {
+            "time": 400,
+            "timeout": 2500,
+            "rate_limit": 100,
+            "target": [
+                100,
+                240,
+                1100,
+                320
+            ],
+            "threshold": 0.95
+        },
+        "post_delay": 300,
+        "next": [
+            "号令_点刷新5"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "号令_点刷新5"
+        ]
+    },
+    "号令_点刷新5": {
+        "attach": {
+            "description": "点第6枚刷新；点完或没有都回查找业火"
+        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "daily_order/refresh.png",
+            "daily_order/refresh_dark.png"
+        ],
+        "roi": [
+            380,
+            230,
+            820,
+            220
+        ],
+        "threshold": 0.9,
+        "order_by": "Vertical",
+        "index": 5,
+        "action": "Click",
+        "post_wait_freezes": {
+            "time": 400,
+            "timeout": 2500,
+            "rate_limit": 100,
+            "target": [
+                100,
+                240,
+                1100,
+                320
+            ],
+            "threshold": 0.95
+        },
+        "post_delay": 300,
+        "next": [
+            "号令_查找业火"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "号令_查找业火"
+        ]
+    },
+    "每日号令_结束": {
+        "attach": {
+            "description": "无业火且无刷新：号令已完成或不可再刷，正常结束"
+        },
+        "action": "DoNothing",
+        "next": []
+    },
+    "每日号令_结束失败": {
+        "attach": {
+            "description": "菜单/门派/江湖号令对不上时停住"
+        },
+        "action": "DoNothing",
+        "next": []
+    }
+}
