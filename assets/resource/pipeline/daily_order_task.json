@@ -12,6 +12,8 @@
             "号令_定位匹配中",
             "号令_点开始匹配",
             "号令_点前往",
+            "号令_业火已领完",
+            "号令_业火可领奖",
             "号令_见业火焚身",
             "号令_等号令页",
             "号令_已开功能菜单",
@@ -156,21 +158,382 @@
     },
     "号令_查找业火": {
         "attach": {
-            "description": "轮询业火；没有则检查是否还有刷新按钮"
+            "description": "已领完(变灰有参与文案)→结束；可领奖(金色+图标)→点图标；否则点未完成业火进详情"
         },
         "action": "DoNothing",
         "next": [
+            "号令_业火已领完",
+            "号令_业火可领奖",
             "号令_见业火焚身"
         ],
-        "timeout": 4444,
+        "timeout": 5000,
         "rate_limit": 400,
         "on_error": [
             "号令_检查刷新"
         ]
     },
+    "号令_业火已领完": {
+        "attach": {
+            "description": "领奖后业火变灰，标题下出现「参与…觉障林」文案：任务真正结束"
+        },
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "OCR",
+                "expected": [
+                    "业火焚身",
+                    "业火"
+                ],
+                "roi": [
+                    100,
+                    240,
+                    1100,
+                    320
+                ],
+                "threshold": 0.5,
+                "sub_name": "yehuo"
+            },
+            {
+                "recognition": "OCR",
+                "expected": [
+                    "参与",
+                    "觉障林",
+                    "觉障"
+                ],
+                "roi": "yehuo",
+                "roi_offset": [
+                    -40,
+                    20,
+                    260,
+                    90
+                ],
+                "threshold": 0.4
+            }
+        ],
+        "box_index": 0,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "每日号令_结束"
+        ],
+        "timeout": 2500,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "号令_业火可领奖": {
+        "attach": {
+            "description": "业火金色高亮且待领：先认高亮，再点标题下两个领奖图标"
+        },
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "OCR",
+                "expected": [
+                    "业火焚身",
+                    "业火"
+                ],
+                "roi": [
+                    100,
+                    240,
+                    1100,
+                    320
+                ],
+                "threshold": 0.5,
+                "sub_name": "yehuo"
+            },
+            {
+                "recognition": "ColorMatch",
+                "method": 40,
+                "lower": [
+                    15,
+                    80,
+                    180
+                ],
+                "upper": [
+                    40,
+                    255,
+                    255
+                ],
+                "count": 500,
+                "connected": false,
+                "roi": "yehuo",
+                "roi_offset": [
+                    -40,
+                    -20,
+                    280,
+                    160
+                ]
+            }
+        ],
+        "box_index": 0,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "号令_点业火领奖"
+        ],
+        "timeout": 2500,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "号令_点业火领奖": {
+        "attach": {
+            "description": "点业火标题下领奖图标（两枚相同，右枚带数量）；点完进结算"
+        },
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "OCR",
+                "expected": [
+                    "业火焚身",
+                    "业火"
+                ],
+                "roi": [
+                    100,
+                    240,
+                    1100,
+                    320
+                ],
+                "threshold": 0.5,
+                "sub_name": "yehuo"
+            },
+            {
+                "recognition": "TemplateMatch",
+                "template": [
+                    "daily_order/claim_icon.png",
+                    "daily_order/claim_icon_num.png"
+                ],
+                "roi": "yehuo",
+                "roi_offset": [
+                    -30,
+                    25,
+                    220,
+                    100
+                ],
+                "threshold": 0.7,
+                "order_by": "Horizontal",
+                "sub_name": "claim"
+            }
+        ],
+        "box_index": 1,
+        "action": "Click",
+        "post_delay": 1200,
+        "max_hit": 4,
+        "next": [
+            "号令_领奖结算"
+        ],
+        "timeout": 8000,
+        "rate_limit": 400,
+        "on_error": [
+            "号令_点业火领奖偏移",
+            "号令_领奖结算"
+        ]
+    },
+    "号令_点业火领奖偏移": {
+        "attach": {
+            "description": "模板未中时：点业火标题下方图标区（先左后右）"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "业火焚身",
+            "业火"
+        ],
+        "roi": [
+            100,
+            240,
+            1100,
+            320
+        ],
+        "threshold": 0.5,
+        "action": "Click",
+        "target": true,
+        "target_offset": [
+            20,
+            50,
+            40,
+            40
+        ],
+        "post_delay": 1000,
+        "max_hit": 2,
+        "next": [
+            "号令_点业火领奖偏移右",
+            "号令_领奖结算"
+        ],
+        "timeout": 5000,
+        "rate_limit": 400,
+        "on_error": [
+            "号令_领奖结算"
+        ]
+    },
+    "号令_点业火领奖偏移右": {
+        "attach": {
+            "description": "再点右侧带数量的领奖图标"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "业火焚身",
+            "业火"
+        ],
+        "roi": [
+            100,
+            240,
+            1100,
+            320
+        ],
+        "threshold": 0.5,
+        "action": "Click",
+        "target": true,
+        "target_offset": [
+            70,
+            50,
+            40,
+            40
+        ],
+        "post_delay": 1200,
+        "max_hit": 2,
+        "next": [
+            "号令_领奖结算"
+        ],
+        "timeout": 5000,
+        "rate_limit": 400,
+        "on_error": [
+            "号令_领奖结算"
+        ]
+    },
+    "号令_领奖结算": {
+        "attach": {
+            "description": "领奖结算：点确定/继续/领取，或点空白关掉，再确认业火已变灰"
+        },
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "post_delay": 800,
+        "next": [
+            "号令_领奖点确定",
+            "号令_领奖点继续",
+            "号令_领奖点领取",
+            "号令_领奖点空白",
+            "号令_业火已领完"
+        ],
+        "timeout": 12000,
+        "rate_limit": 400,
+        "on_error": [
+            "号令_业火已领完",
+            "每日号令_结束"
+        ]
+    },
+    "号令_领奖点确定": {
+        "attach": {
+            "description": "结算弹窗点确定"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "^确定$",
+            "确定"
+        ],
+        "order_by": "Expected",
+        "roi": [
+            400,
+            360,
+            480,
+            280
+        ],
+        "threshold": 0.45,
+        "action": "Click",
+        "post_delay": 1000,
+        "max_hit": 2,
+        "next": [
+            "号令_业火已领完",
+            "号令_领奖结算"
+        ],
+        "timeout": 4000,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "号令_领奖点继续": {
+        "attach": {
+            "description": "结算页点继续"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "继续"
+        ],
+        "roi": [
+            700,
+            500,
+            580,
+            220
+        ],
+        "threshold": 0.35,
+        "action": "Click",
+        "post_delay": 1000,
+        "max_hit": 3,
+        "next": [
+            "号令_业火已领完",
+            "号令_领奖结算"
+        ],
+        "timeout": 4000,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "号令_领奖点领取": {
+        "attach": {
+            "description": "结算/领奖按钮「领取」"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "领取"
+        ],
+        "roi": [
+            400,
+            360,
+            480,
+            280
+        ],
+        "threshold": 0.4,
+        "action": "Click",
+        "post_delay": 1000,
+        "max_hit": 2,
+        "next": [
+            "号令_业火已领完",
+            "号令_领奖结算"
+        ],
+        "timeout": 4000,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "号令_领奖点空白": {
+        "attach": {
+            "description": "无按钮文案时点中央空白关结算"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            640,
+            360
+        ],
+        "post_delay": 800,
+        "max_hit": 2,
+        "next": [
+            "号令_业火已领完",
+            "每日号令_结束"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "号令_业火已领完",
+            "每日号令_结束"
+        ]
+    },
+    "号令_业火已完成": {
+        "attach": {
+            "description": "兼容旧名：转可领奖"
+        },
+        "action": "DoNothing",
+        "next": [
+            "号令_业火可领奖"
+        ]
+    },
     "号令_见业火焚身": {
         "attach": {
-            "description": "OCR 点业火标签，进入详情"
+            "description": "OCR 点未完成业火（已领完/可领奖先拦），进入详情"
         },
         "recognition": "OCR",
         "expected": [
@@ -198,7 +561,7 @@
     },
     "号令_检查刷新": {
         "attach": {
-            "description": "有无刷新按钮。没有说明号令已刷完/已完成，正常结束；有则点齐全部"
+            "description": "无业火时：有刷新则点齐；无刷新作兜底结束（完成态优先看业火已领完）"
         },
         "recognition": "TemplateMatch",
         "template": [
@@ -491,7 +854,7 @@
     },
     "每日号令_结束": {
         "attach": {
-            "description": "号令页已无任何刷新：暂作刷完正常结束（高亮条件后补）"
+            "description": "业火领奖变灰后，或无业火且无刷新：正常结束"
         },
         "action": "DoNothing",
         "next": []
