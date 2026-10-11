@@ -20,7 +20,8 @@
             "集英",
             "集英_OCR",
             "取消yysls",
-            "点击空白区域关闭"
+            "点击空白区域关闭",
+            "识途"
         ],
         "on_error": [
             "等10秒"
@@ -126,6 +127,26 @@
             0
         ],
         "post_delay": 200,
+        "next": [],
+        "on_error": []
+    },
+    "识途": {
+        "attach": {
+            "description": "找不到集英时点左下角识途，等3秒再继续找集英。实测文字框约[186,669,30,15]"
+        },
+        "action": "Click",
+        "recognition": "OCR",
+        "expected": [
+            "识途"
+        ],
+        "threshold": 0.7,
+        "roi": [
+            0,
+            560,
+            320,
+            160
+        ],
+        "post_delay": 3000,
         "next": [],
         "on_error": []
     },
