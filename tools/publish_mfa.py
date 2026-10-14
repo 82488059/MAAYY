@@ -17,7 +17,7 @@ from configure import configure_ocr_model
 ROOT = Path(__file__).parent.parent.resolve()
 ASSETS = ROOT / "assets"
 AGENT = ROOT / "agent"
-DEFAULT_MFA = Path("E:/repos/MFAAvalonia")
+DEFAULT_MFA = Path("E:/repos/MAAJN/MFAAvalonia")
 
 
 def publish_mfa(mfa_dir: Path) -> None:
