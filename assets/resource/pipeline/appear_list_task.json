@@ -1,16 +1,12 @@
-// 外观上架 V2：主菜单 → 商店（不经不肝）→ 交易 → 出售道具。
-// 有可寄售道具 = 可寄售区第一格对不上空格模板 appear/可寄售_空格.png。
-// 有空位且第一格非空：点第一格 → 长按减号 (1028,579) → toast「价格已达最小」到底 → 点寄售 (1161,678) → 确认「上架成功」(1082,474) → 回分流循环。
-// 到底主判定：toast ROI [450,80,380,65] OCR「价格已达最小」；灰减号模板仅辅助。禁止同价 OCR / 固定金额兜底。长按最多 8 次。
-// 空仓 / 满仓 / 循环耗尽：先回主界面（对齐存放_退出循环）再成功。空格与灰减号图待补。
 {
     "外观上架": {
         "attach": {
-            "description": "入口。主菜单直点「商店」（不走不肝）→顶栏「交易」→「出售道具」。有空位且第一格有货则长按减号到底→寄售→确认，循环至无货或满仓；结束前回主界面。已在更后面的页面则从该页接着走"
+            "description": "入口。主菜单直点「商店」（不走不肝）→顶栏「交易」→「出售道具」。有空位且第一格有货则长按减号到底→寄售→确认，循环至无货或满仓；结束前回主界面。已在更后面的页面则从该页接着走。入口 next 含 [JumpBack]关控制器弹窗（点取消）。"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
         "next": [
+            "[JumpBack]外观_关控制器弹窗",
             "外观_认出售成功",
             "外观_点出售道具",
             "外观_点交易",
@@ -339,6 +335,7 @@
         "recognition": "DirectHit",
         "action": "DoNothing",
         "next": [
+            "[JumpBack]外观_关控制器弹窗",
             "外观_见无可寄售",
             "外观_见已满",
             "外观_第一格是空",
@@ -412,7 +409,8 @@
         "action": "DoNothing",
         "post_delay": 200,
         "next": [
-            "外观_第一格非空"
+            "外观_第一格非空",
+            "外观_点第一个可寄售"
         ],
         "timeout": 2000,
         "on_error": [
@@ -476,12 +474,13 @@
             1024,
             208
         ],
-        "post_delay": 900,
+        "post_delay": 2000,
         "max_hit": 6,
         "next": [
+            "[JumpBack]外观_关控制器弹窗",
             "外观_认上架面板"
         ],
-        "timeout": 3000,
+        "timeout": 5000,
         "rate_limit": 400,
         "on_error": [
             "外观_回主界面"
@@ -489,49 +488,47 @@
     },
     "外观_认上架面板": {
         "attach": {
-            "description": "右下同时有「价格」和「寄售」才开始降价。^寄售$ 对不上标题「可寄售」。只认不点。认不到则回主界面，不长按、不点寄售"
+            "description": "分身出售页点第一格后右下为「单价」与「寄售」（不是「价格」）。V2：OCR 认 单价/价格 + 寄售；ROI 盖右下；timeout 加长；失败则仍进降价一轮。"
         },
         "recognition": "And",
         "all_of": [
             {
                 "recognition": "OCR",
                 "expected": [
-                    "^价格$",
-                    "^价格"
+                    "单价",
+                    "价格"
                 ],
-                "order_by": "Expected",
                 "roi": [
-                    640,
-                    420,
-                    620,
-                    280
+                    880,
+                    480,
+                    380,
+                    140
                 ],
-                "threshold": 0.4
+                "threshold": 0.25
             },
             {
                 "recognition": "OCR",
                 "expected": [
-                    "^寄售$",
-                    "^寄售"
+                    "寄售"
                 ],
-                "order_by": "Expected",
                 "roi": [
-                    640,
-                    420,
+                    980,
                     620,
-                    280
+                    280,
+                    90
                 ],
-                "threshold": 0.4
+                "threshold": 0.25
             }
         ],
         "action": "DoNothing",
-        "post_delay": 200,
+        "post_delay": 400,
         "next": [
+            "[JumpBack]外观_关控制器弹窗",
             "外观_降价一轮"
         ],
-        "timeout": 3000,
+        "timeout": 8000,
         "on_error": [
-            "外观_回主界面"
+            "外观_降价一轮"
         ]
     },
     "外观_降价一轮": {
@@ -541,8 +538,8 @@
         "recognition": "DirectHit",
         "action": "DoNothing",
         "next": [
+            "[JumpBack]外观_关控制器弹窗",
             "外观_认到底toast",
-            "外观_减号已灰",
             "外观_长按减号"
         ],
         "timeout": 1500,
@@ -854,5 +851,63 @@
         "next": [],
         "timeout": 4000,
         "on_error": []
+    },
+    "外观_关控制器弹窗": {
+        "attach": {
+            "description": "分身/模拟器切入时弹「控制器已连接」。外观任务点「取消」保留触控，不点确认。"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "控制器已连接",
+            "控制设备切换为控制器"
+        ],
+        "roi": [
+            160,
+            180,
+            960,
+            360
+        ],
+        "threshold": 0.3,
+        "action": "DoNothing",
+        "next": [
+            "外观_点控制器取消"
+        ],
+        "timeout": 1500,
+        "on_error": []
+    },
+    "外观_点控制器取消": {
+        "attach": {
+            "description": "点控制器弹窗「取消」。优先 OCR；盲点 (177,475) 对齐实测左下取消键。"
+        },
+        "recognition": "OCR",
+        "expected": "取消",
+        "roi": [
+            100,
+            400,
+            280,
+            140
+        ],
+        "threshold": 0.3,
+        "action": "Click",
+        "post_delay": 500,
+        "max_hit": 3,
+        "next": [],
+        "timeout": 2000,
+        "on_error": [
+            "外观_盲点控制器取消"
+        ]
+    },
+    "外观_盲点控制器取消": {
+        "attach": {
+            "description": "OCR 取消失败时盲点 (177,475)"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            177,
+            475
+        ],
+        "post_delay": 500,
+        "next": []
     }
 }
