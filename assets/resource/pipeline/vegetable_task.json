@@ -8,13 +8,19 @@
         ],
         "on_error": [
             "无限蔬菜"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]无限蔬菜：开始[/color]"
+            ]
+        }
     },
     "无限循环蔬菜": {
         "attach": {
-            "description": "持续循环蔬菜"
+            "description": "持续循环蔬菜。每轮先 JumpBack 关控制器弹窗"
         },
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "[JumpBack]寻找蔬菜"
         ],
         "on_error": [
@@ -41,7 +47,12 @@
         "on_error": [
             "处理异常",
             "无限蔬菜"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：寻找蔬菜[/color]"
+            ]
+        }
     },
     "处理普通蔬菜": {
         "attach": {
@@ -65,7 +76,12 @@
         ],
         "on_error": [
             "处理异常"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：处理普通蔬菜[/color]"
+            ]
+        }
     },
     "特殊农牧": {
         "attach": {

@@ -8,13 +8,19 @@
         ],
         "on_error": [
             "无限水井"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]无限水井：开始[/color]"
+            ]
+        }
     },
     "无限循环水井": {
         "attach": {
-            "description": "持续循环水井"
+            "description": "持续循环水井。每轮先 JumpBack 关控制器弹窗"
         },
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "[JumpBack]寻找水井"
         ],
         "on_error": [
@@ -41,7 +47,12 @@
         "on_error": [
             "处理异常",
             "无限水井"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：寻找水井[/color]"
+            ]
+        }
     },
     "处理普通水": {
         "attach": {
@@ -65,7 +76,12 @@
         ],
         "on_error": [
             "处理异常"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：处理普通水[/color]"
+            ]
+        }
     },
     "处理水井加速": {
         "attach": {
@@ -84,7 +100,12 @@
             "20",
             "免费完成",
             "回主界面"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：水井加速[/color]"
+            ]
+        }
     },
     "查找水井": {
         "attach": {

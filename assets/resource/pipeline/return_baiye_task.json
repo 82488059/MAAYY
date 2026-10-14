@@ -1,18 +1,77 @@
 {
     "返回百业": {
         "attach": {
-            "description": "入口。先关登录礼浮层。主界面→主菜单→百业→(可能过场)→右下返回驻地→确定→等加载结束（右上出现退出）。已在百业页（见返回驻地）则直接点返回。结束后走锚点回百业_结束后，未设置则停在门口"
+            "description": "入口。主界面→主菜单→百业→(可能开启百业引导)→右下返回驻地→确定→等加载结束（右上出现退出）。已在引导页/百业页则跳过菜单。结束后走锚点回百业_结束后，未设置则停在门口"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：返回百业[/color]"
+            ]
+        },
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_已在驻地",
+            "回百业_已见开启百业",
             "回百业_已见返回驻地",
             "回百业_已开功能菜单",
             "回百业_点主菜单"
         ],
         "timeout": 3000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
+            "回百业_结束失败"
+        ]
+    },
+    "回百业_已见开启百业": {
+        "attach": {
+            "description": "已在百业引导页（右下「开启百业」）。勿再走功能菜单点「百业」"
+        },
+        "recognition": "OCR",
+        "expected": "开启百业",
+        "roi": [
+            1000,
+            620,
+            270,
+            100
+        ],
+        "threshold": 0.4,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "回百业_点开启百业"
+        ],
+        "timeout": 1500,
+        "rate_limit": 300,
+        "on_error": [
+            "回百业_已见返回驻地"
+        ]
+    },
+    "回百业_点开启百业": {
+        "attach": {
+            "description": "引导页右下「开启百业」。只点一次，点完再认「返回驻地」"
+        },
+        "recognition": "OCR",
+        "expected": "开启百业",
+        "roi": [
+            1000,
+            620,
+            270,
+            100
+        ],
+        "threshold": 0.4,
+        "action": "Click",
+        "post_delay": 1500,
+        "max_hit": 1,
+        "next": [
+            "回百业_点返回驻地"
+        ],
+        "timeout": 20000,
+        "rate_limit": 400,
+        "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
+            "回百业_点返回驻地",
             "回百业_结束失败"
         ]
     },
@@ -88,12 +147,13 @@
         ],
         "timeout": 6000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_结束失败"
         ]
     },
     "回百业_点百业": {
         "attach": {
-            "description": "功能菜单点独立「百业」入口。只点一次。已在百业页则改走已见返回驻地。timeout 120 秒留给过场后认「返回驻地」"
+            "description": "功能菜单点独立「百业」入口。只点一次。点后可能先见「开启百业」引导，再「返回驻地」。timeout 120 秒留给过场"
         },
         "recognition": "OCR",
         "expected": [
@@ -111,11 +171,14 @@
         "post_delay": 800,
         "max_hit": 1,
         "next": [
+            "回百业_点开启百业",
             "回百业_点返回驻地"
         ],
         "timeout": 120000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
+            "回百业_已见开启百业",
             "回百业_已见返回驻地",
             "回百业_结束失败"
         ]
@@ -146,6 +209,7 @@
         "timeout": 20000,
         "rate_limit": 400,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_结束失败"
         ]
     },
@@ -174,6 +238,7 @@
         "timeout": 120000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_再点返回驻地",
             "回百业_关百业菜单",
             "回百业_结束失败"
@@ -205,6 +270,7 @@
         "timeout": 20000,
         "rate_limit": 400,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_关百业菜单",
             "回百业_结束失败"
         ]
@@ -232,6 +298,7 @@
         ],
         "timeout": 120000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_结束失败"
         ],
         "rate_limit": 500
@@ -242,6 +309,11 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:green]阶段完成：返回百业[/color]"
+            ]
+        },
         "next": [
             {
                 "name": "回百业_结束后",
@@ -260,6 +332,11 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:yellow]返回百业收工（停住）[/color]"
+            ]
+        },
         "next": []
     },
     "回百业_结束失败": {
@@ -271,6 +348,11 @@
         "custom_action": "打印失败节点",
         "custom_action_param": {
             "reason": "返回百业结束失败"
+        },
+        "focus": {
+            "start": [
+                "[color:red]阶段失败：返回百业[/color]"
+            ]
         },
         "post_delay": 100,
         "next": [],
@@ -351,6 +433,7 @@
         ],
         "timeout": 5000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_关百业菜单再认",
             "回百业_结束失败"
         ]
@@ -376,6 +459,7 @@
         ],
         "timeout": 5000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "回百业_结束失败"
         ]
     }

@@ -5,6 +5,11 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：退出游戏（暂空转）[/color]"
+            ]
+        },
         "next": [
             "退出游戏_结束"
         ],
@@ -19,6 +24,11 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:green]一条龙：全部完成（退出暂空转）[/color]"
+            ]
+        },
         "next": []
     }
 }

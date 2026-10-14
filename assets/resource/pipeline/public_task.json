@@ -191,10 +191,16 @@
         "next": []
     },
     "处理异常": {
+        "focus": {
+            "start": [
+                "[color:yellow]阶段：处理异常[/color]"
+            ]
+        },
         "attach": {
-            "description": "处理异常情况"
+            "description": "处理异常情况。先 JumpBack 关控制器弹窗（取消优先，再确认），再认机关/重试等"
         },
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "防机关术",
             "重试",
             "理财",
@@ -208,6 +214,130 @@
             "关闭改布局",
             "回主界面"
         ]
+    },
+    "公共_关控制器弹窗": {
+        "attach": {
+            "description": "模拟器切入控制器时的挡操作弹窗。认到文案后：双按钮（是否将控制设备…）点左取消坐标；单确认再点中「确认」。供各任务 [JumpBack] 调用"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "是否将控制设备",
+            "控制器已连接",
+            "控制设备切换为控制器",
+            "稍后可在设置"
+        ],
+        "roi": [
+            160,
+            180,
+            960,
+            360
+        ],
+        "threshold": 0.35,
+        "action": "DoNothing",
+        "next": [
+            "公共_控制器双按钮点取消",
+            "公共_控制器点取消",
+            "公共_控制器点确认"
+        ],
+        "timeout": 2000,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "公共_关花瓣叉弹窗": {
+        "attach": {
+            "description": "活动/特惠全屏暗底弹窗右上角花瓣形关闭叉（如「和鸣上新·笔绘万象」）。模板 close_petal_x.png。供 [JumpBack] 调用；没有弹窗则本节点认不到，父节点继续 next"
+        },
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]关弹窗：花瓣叉[/color]"
+            ]
+        },
+        "recognition": "TemplateMatch",
+        "template": "close_petal_x.png",
+        "roi": [
+            1000,
+            0,
+            280,
+            220
+        ],
+        "threshold": 0.72,
+        "action": "Click",
+        "post_delay": 600,
+        "max_hit": 2,
+        "next": [],
+        "timeout": 2500,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "公共_控制器双按钮点取消": {
+        "attach": {
+            "description": "双按钮变体文案「是否将控制设备切换为控制器？」。按钮字 OCR 不稳，按实测亮区点左取消 (140,475)"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "是否将控制设备",
+            "是否将控制设备切换"
+        ],
+        "roi": [
+            160,
+            180,
+            960,
+            360
+        ],
+        "threshold": 0.35,
+        "action": "Click",
+        "target": [
+            140,
+            475
+        ],
+        "post_wait_freezes": 400,
+        "post_delay": 600,
+        "max_hit": 1,
+        "next": [],
+        "timeout": 2500,
+        "on_error": []
+    },
+    "公共_控制器点取消": {
+        "attach": {
+            "description": "双按钮左「取消」OCR 备用。ROI 盖住实测亮区 [78,456,126,38]"
+        },
+        "recognition": "OCR",
+        "expected": "取消",
+        "roi": [
+            60,
+            440,
+            180,
+            70
+        ],
+        "threshold": 0.3,
+        "action": "Click",
+        "post_wait_freezes": 400,
+        "post_delay": 400,
+        "max_hit": 2,
+        "next": [],
+        "timeout": 2500,
+        "on_error": []
+    },
+    "公共_控制器点确认": {
+        "attach": {
+            "description": "单按钮变体点中「确认」；双按钮右确认 ROI 亦覆盖。优先走双按钮点取消"
+        },
+        "recognition": "OCR",
+        "expected": "确认",
+        "roi": [
+            400,
+            360,
+            800,
+            200
+        ],
+        "threshold": 0.35,
+        "action": "Click",
+        "post_wait_freezes": 400,
+        "post_delay": 400,
+        "max_hit": 3,
+        "next": [],
+        "timeout": 2500,
+        "on_error": []
     },
     "重试": {
         "attach": {
@@ -392,6 +522,11 @@
         "next": []
     },
     "修改为地基模式": {
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]修改为地基模式：开始[/color]"
+            ]
+        },
         "attach": {
             "description": "修改为地基模式选项"
         },
@@ -405,12 +540,18 @@
             0
         ],
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "是地基",
             "不是地基",
             "修改为地基模式"
         ]
     },
     "是地基": {
+        "focus": {
+            "succeeded": [
+                "[color:green]阶段：已是地基[/color]"
+            ]
+        },
         "attach": {
             "description": "是地基选项"
         },
@@ -421,6 +562,11 @@
         ]
     },
     "不是地基": {
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：改为地基[/color]"
+            ]
+        },
         "attach": {
             "description": "不是地基选项"
         },

@@ -1,10 +1,16 @@
 {
     "一条龙": {
         "attach": {
-            "description": "入口。只写跨任务锚点，再进自动买药。买药内部未买/买齐六项由自动买药初始化。买药_结束后→离开百业→自动炼药→自动买钱→返回百业→找温无双；仅全成功并认出对话条才找温无双_结束后→退出游戏（暂空转）"
+            "description": "入口。Custom 一条龙_编排按 checkbox「一条龙步骤」串锚点并进第一段；先 JumpBack 关控制器/花瓣叉弹窗。默认全勾=买药→离开→炼药→买钱→返回→找温→退出（空转）。需 Agent。"
         },
         "recognition": "DirectHit",
-        "action": "DoNothing",
+        "action": "Custom",
+        "custom_action": "一条龙_编排",
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]一条龙：开始[/color]"
+            ]
+        },
         "anchor": {
             "买药_结束后": "离开百业",
             "离开百业_结束后": "自动炼药",
@@ -14,12 +20,85 @@
             "找温无双_结束后": "退出游戏"
         },
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
+            "[JumpBack]公共_关花瓣叉弹窗",
             "自动买药"
         ],
-        "timeout": 3000,
+        "timeout": 6000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
+            "[JumpBack]公共_关花瓣叉弹窗",
             "自动买药"
         ]
+    },
+    "一条龙_收工": {
+        "attach": {
+            "description": "一条龙步骤全部未勾选时的空收工"
+        },
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:yellow]一条龙：未勾选步骤，收工[/color]"
+            ]
+        },
+        "next": []
+    },
+    "一条龙_勾选_买药": {
+        "attach": {
+            "description": "checkbox 勾选标记（默认关闭；界面默认勾选后 enabled=true）"
+        },
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "DoNothing"
+    },
+    "一条龙_勾选_离开": {
+        "attach": {
+            "description": "checkbox 勾选标记（默认关闭；界面默认勾选后 enabled=true）"
+        },
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "DoNothing"
+    },
+    "一条龙_勾选_炼药": {
+        "attach": {
+            "description": "checkbox 勾选标记（默认关闭；界面默认勾选后 enabled=true）"
+        },
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "DoNothing"
+    },
+    "一条龙_勾选_买钱": {
+        "attach": {
+            "description": "checkbox 勾选标记（默认关闭；界面默认勾选后 enabled=true）"
+        },
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "DoNothing"
+    },
+    "一条龙_勾选_返回": {
+        "attach": {
+            "description": "checkbox 勾选标记（默认关闭；界面默认勾选后 enabled=true）"
+        },
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "DoNothing"
+    },
+    "一条龙_勾选_找温": {
+        "attach": {
+            "description": "checkbox 勾选标记（默认关闭；界面默认勾选后 enabled=true）"
+        },
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "DoNothing"
+    },
+    "一条龙_勾选_退出": {
+        "attach": {
+            "description": "checkbox 勾选标记（默认关闭；界面默认勾选后 enabled=true）"
+        },
+        "enabled": false,
+        "recognition": "DirectHit",
+        "action": "DoNothing"
     },
     "自动买药": {
         "attach": {

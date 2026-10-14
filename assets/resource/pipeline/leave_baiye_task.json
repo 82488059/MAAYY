@@ -5,11 +5,17 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：离开百业[/color]"
+            ]
+        },
         "next": [
             "离百业_点退出"
         ],
         "timeout": 20000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -43,6 +49,7 @@
         ],
         "timeout": 8000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -91,6 +98,7 @@
         ],
         "timeout": 5000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -106,6 +114,7 @@
         "timeout": 3500,
         "rate_limit": 250,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -129,6 +138,7 @@
         ],
         "timeout": 5000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -146,6 +156,7 @@
         "timeout": 130000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -196,6 +207,7 @@
         "timeout": 120000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -218,6 +230,11 @@
         "inverse": true,
         "action": "DoNothing",
         "post_delay": 1200,
+        "focus": {
+            "succeeded": [
+                "[color:green]阶段完成：离开百业[/color]"
+            ]
+        },
         "next": [
             {
                 "name": "离开百业_结束后",
@@ -228,6 +245,7 @@
         "timeout": 10000,
         "rate_limit": 400,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "离开百业_结束失败"
         ]
     },
@@ -237,6 +255,11 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:yellow]离开百业收工（停住）[/color]"
+            ]
+        },
         "next": []
     },
     "离开百业_结束失败": {
@@ -248,6 +271,11 @@
         "custom_action": "打印失败节点",
         "custom_action_param": {
             "reason": "离开百业结束失败"
+        },
+        "focus": {
+            "start": [
+                "[color:red]阶段失败：离开百业[/color]"
+            ]
         },
         "post_delay": 100,
         "next": [],

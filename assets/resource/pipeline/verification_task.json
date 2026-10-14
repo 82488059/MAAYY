@@ -3,7 +3,12 @@
         "next": [
             "机关1",
             "收下"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：破解机关[/color]"
+            ]
+        }
     },
     "机关1": {
         "recognition": "TemplateMatch",

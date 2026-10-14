@@ -14,7 +14,12 @@
         ],
         "on_error": [
             "无限集英"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]无限集英：开始[/color]"
+            ]
+        }
     },
     "无限集英1": {
         "attach": {
@@ -22,6 +27,7 @@
         },
         "action": "DoNothing",
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "集英",
             "集英_OCR",
             "取消yysls",
@@ -43,12 +49,18 @@
             "seconds": 20
         },
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "[JumpBack]太极",
             "[JumpBack]等10秒"
         ],
         "on_error": [
             "无限太极"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]无限太极：开始[/color]"
+            ]
+        }
     },
     "等10秒": {
         "attach": {
@@ -74,7 +86,12 @@
         ],
         "post_delay": 11000,
         "next": [],
-        "on_error": []
+        "on_error": [],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：点集英[/color]"
+            ]
+        }
     },
     "集英_OCR": {
         "attach": {
@@ -103,7 +120,12 @@
         ],
         "post_delay": 11000,
         "next": [],
-        "on_error": []
+        "on_error": [],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：点集英(OCR)[/color]"
+            ]
+        }
     },
     "取消yysls": {
         "attach": {
@@ -177,6 +199,11 @@
         ],
         "post_delay": 20000,
         "next": [],
-        "on_error": []
+        "on_error": [],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：点太极[/color]"
+            ]
+        }
     }
 }

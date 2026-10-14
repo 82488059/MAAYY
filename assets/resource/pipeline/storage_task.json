@@ -15,8 +15,14 @@
         ],
         "timeout": 4000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_直接失败"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：存放原料[/color]"
+            ]
+        }
     },
     "存放_从屏幕开始": {
         "attach": {
@@ -32,7 +38,12 @@
         "rate_limit": 250,
         "on_error": [
             "存放_点主菜单"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：存放定位界面[/color]"
+            ]
+        }
     },
     "存放_屏上有道具": {
         "attach": {
@@ -96,6 +107,7 @@
         ],
         "timeout": 6000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_直接失败"
         ]
     },
@@ -141,6 +153,7 @@
         ],
         "timeout": 2500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -230,6 +243,7 @@
         ],
         "timeout": 3000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -444,6 +458,7 @@
         ],
         "timeout": 2000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -565,6 +580,7 @@
         ],
         "timeout": 2500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -775,6 +791,7 @@
             "存放_等页签确认"
         ],
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -872,6 +889,7 @@
             "存放_核本页数字"
         ],
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -1379,6 +1397,7 @@
         "timeout": 2000,
         "rate_limit": 300,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_补开仓库",
             "存放_失败时"
         ]
@@ -1429,6 +1448,7 @@
         ],
         "timeout": 1500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -1961,6 +1981,7 @@
         ],
         "timeout": 1500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_失败时"
         ]
     },
@@ -2151,6 +2172,7 @@
         "timeout": 1500,
         "rate_limit": 350,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_点返回坐标",
             "存放_直接失败"
         ]
@@ -2216,6 +2238,7 @@
             "存放_退出循环"
         ],
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "存放_直接失败"
         ]
     },
@@ -2224,7 +2247,12 @@
             "description": "正常结束，人在主界面"
         },
         "recognition": "DirectHit",
-        "action": "DoNothing"
+        "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:green]阶段完成：存放原料[/color]"
+            ]
+        }
     },
     "存放_标记失败": {
         "attach": {
@@ -2235,7 +2263,12 @@
         "next": [
             "存放_失败哨兵"
         ],
-        "timeout": 400
+        "timeout": 400,
+        "focus": {
+            "start": [
+                "[color:red]阶段失败：存放原料（回主后）[/color]"
+            ]
+        }
     },
     "存放_直接失败": {
         "attach": {
@@ -2246,7 +2279,12 @@
         "next": [
             "存放_失败哨兵"
         ],
-        "timeout": 400
+        "timeout": 400,
+        "focus": {
+            "start": [
+                "[color:red]阶段失败：存放原料[/color]"
+            ]
+        }
     },
     "存放_失败哨兵": {
         "attach": {

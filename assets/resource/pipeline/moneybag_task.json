@@ -43,6 +43,7 @@
         ],
         "timeout": 4000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "钱袋_结束失败"
         ]
     },
@@ -1017,6 +1018,11 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:green]阶段完成：自动买钱[/color]"
+            ]
+        },
         "next": [
             {
                 "name": "钱袋_结束后",
@@ -1035,6 +1041,11 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:yellow]买钱收工（停住）[/color]"
+            ]
+        },
         "next": []
     },
     "钱袋_结束失败": {
@@ -1047,6 +1058,11 @@
         "custom_action_param": {
             "reason": "买钱袋结束失败"
         },
+        "focus": {
+            "start": [
+                "[color:red]阶段失败：自动买钱[/color]"
+            ]
+        },
         "post_delay": 100,
         "next": [],
         "timeout": 4000,
@@ -1058,12 +1074,18 @@
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：自动买钱[/color]"
+            ]
+        },
         "next": [
             "钱袋_已开功能菜单",
             "钱袋_点主菜单"
         ],
         "timeout": 3000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "钱袋_结束失败"
         ]
     }

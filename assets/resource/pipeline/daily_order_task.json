@@ -1,16 +1,18 @@
 {
     "每日号令": {
         "attach": {
-            "description": "入口。先识别当前界面落在哪一步，再从该步接着循环（观战/继续/战斗/匹配/号令页/菜单）。"
+            "description": "入口。先识别当前界面落在哪一步再接着跑。大厅闲置（开始匹配）走收工回主再开号令查业火；仅号令页确认无刷新角标才结束。开始匹配只在「前往」之后点。"
         },
         "action": "DoNothing",
         "next": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_等观战中",
             "号令_点继续",
             "号令_点往生极乐",
             "号令_定位复活机会",
             "号令_定位匹配中",
-            "号令_点开始匹配",
+            "号令_大厅收工",
+            "号令_回大世界",
             "号令_点前往",
             "号令_业火可领奖",
             "号令_业火已领完",
@@ -22,8 +24,14 @@
         "timeout": 12000,
         "rate_limit": 300,
         "on_error": [
-            "每日号令_结束失败"
-        ]
+            "[JumpBack]公共_关控制器弹窗",
+            "每日号令"
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]每日号令：开始/定位[/color]"
+            ]
+        }
     },
     "号令_已开功能菜单": {
         "attach": {
@@ -51,7 +59,12 @@
         "rate_limit": 300,
         "on_error": [
             "号令_点主菜单"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：功能菜单已开[/color]"
+            ]
+        }
     },
     "号令_点主菜单": {
         "attach": {
@@ -76,8 +89,14 @@
         ],
         "timeout": 6000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "每日号令_结束失败"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：打开主菜单[/color]"
+            ]
+        }
     },
     "号令_点门派": {
         "attach": {
@@ -103,6 +122,7 @@
         ],
         "timeout": 5000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "每日号令_结束失败"
         ]
     },
@@ -126,6 +146,7 @@
         ],
         "timeout": 8000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "每日号令_结束失败"
         ]
     },
@@ -145,20 +166,27 @@
             90,
             60
         ],
-        "threshold": 0.7,
+        "threshold": 0.55,
         "action": "DoNothing",
         "post_delay": 400,
         "next": [
             "号令_查找业火"
         ],
-        "timeout": 8000,
+        "timeout": 15000,
         "on_error": [
-            "每日号令_结束失败"
-        ]
+            "[JumpBack]公共_关控制器弹窗",
+            "号令_查找业火",
+            "每日号令"
+        ],
+        "focus": {
+            "succeeded": [
+                "[color:green]阶段：已进号令页[/color]"
+            ]
+        }
     },
     "号令_查找业火": {
         "attach": {
-            "description": "可领奖(金色)→点图标；见业火后先排除卡内仍有刷新(未完成)；无刷新才算领完回主界面"
+            "description": "可领奖→点图标；已领完确认无刷新→回主；未完成→点详情；没有业火则检查刷新——有刷新角标就一直刷，直到刷出业火或没有刷新"
         },
         "action": "DoNothing",
         "next": [
@@ -170,11 +198,16 @@
         "rate_limit": 400,
         "on_error": [
             "号令_检查刷新"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：查找业火[/color]"
+            ]
+        }
     },
     "号令_业火已领完": {
         "attach": {
-            "description": "见业火后复核：卡内右上仍有刷新=未完成去点详情；无刷新=已领完变灰，回主界面。勿用「参与觉障」文案（未完成也有）"
+            "description": "见业火后复核：卡内右上仍有刷新=未完成去点详情；无刷新=已领完变灰。next 确认有刷新失败(on_error)则回主界面正常结束，禁止硬 FAILED。"
         },
         "recognition": "OCR",
         "expected": [
@@ -195,7 +228,9 @@
         ],
         "timeout": 2500,
         "rate_limit": 300,
-        "on_error": []
+        "on_error": [
+            "号令_领完回主界面"
+        ]
     },
     "号令_业火领完确认无刷新": {
         "attach": {
@@ -228,7 +263,7 @@
                     180,
                     110
                 ],
-                "threshold": 0.88
+                "threshold": 0.85
             }
         ],
         "action": "DoNothing",
@@ -256,7 +291,12 @@
         "rate_limit": 400,
         "on_error": [
             "每日号令_结束"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：业火领完，回主界面[/color]"
+            ]
+        }
     },
     "号令_领完见主菜单": {
         "attach": {
@@ -402,7 +442,12 @@
         ],
         "timeout": 2500,
         "rate_limit": 300,
-        "on_error": []
+        "on_error": [],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：业火领奖[/color]"
+            ]
+        }
     },
     "号令_点业火领奖": {
         "attach": {
@@ -662,7 +707,7 @@
     },
     "号令_见业火焚身": {
         "attach": {
-            "description": "OCR 点未完成业火（已领完/可领奖先拦），进入详情"
+            "description": "OCR 点未完成业火（已领完/可领奖先拦），进入详情；失败进检查刷新（有刷新则持续刷）"
         },
         "recognition": "OCR",
         "expected": [
@@ -675,10 +720,10 @@
             1100,
             320
         ],
-        "threshold": 0.7,
+        "threshold": 0.5,
         "action": "Click",
         "post_delay": 1000,
-        "max_hit": 2,
+        "max_hit": 8,
         "next": [
             "号令_点前往"
         ],
@@ -686,7 +731,12 @@
         "rate_limit": 300,
         "on_error": [
             "号令_检查刷新"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：进业火详情[/color]"
+            ]
+        }
     },
     "号令_找刷新": {
         "attach": {
@@ -724,7 +774,7 @@
     },
     "号令_检查刷新": {
         "attach": {
-            "description": "无业火时：浅色 refresh_user 点齐；标签名验签见文档/Agent 可选动作，默认直接点"
+            "description": "无业火时点齐浅色刷新（最多认 6 个位）；有则回找业火继续刷。6 个位都没有刷新 → 无刷新收工（须仍在号令页）才结束"
         },
         "recognition": "TemplateMatch",
         "template": "daily_order/refresh_user.png",
@@ -748,8 +798,14 @@
         ],
         "timeout": 2000,
         "on_error": [
-            "每日号令_结束"
-        ]
+            "号令_无刷新收工",
+            "每日号令"
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：刷新号令卡[/color]"
+            ]
+        }
     },
     "号令_点刷新0": {
         "attach": {
@@ -996,21 +1052,39 @@
     },
     "每日号令_结束": {
         "attach": {
-            "description": "已回主界面，或兜底结束"
+            "description": "正常结束：业火领完回主，或号令页确认刷新位都没有角标"
         },
         "action": "DoNothing",
-        "next": []
+        "next": [],
+        "focus": {
+            "start": [
+                "[color:green]每日号令：完成[/color]"
+            ]
+        }
     },
     "每日号令_结束失败": {
         "attach": {
-            "description": "菜单/门派/江湖号令对不上时停住"
+            "description": "兼容旧失败出口：不宣告失败，转入口「查找当前界面」重定位。任务不应硬失败；停刷条件见号令_无刷新收工"
         },
+        "recognition": "DirectHit",
         "action": "DoNothing",
-        "next": []
+        "next": [
+            "每日号令"
+        ],
+        "timeout": 3000,
+        "rate_limit": 400,
+        "on_error": [
+            "每日号令"
+        ],
+        "focus": {
+            "start": [
+                "[color:yellow]每日号令：重定位当前界面[/color]"
+            ]
+        }
     },
     "号令_点前往": {
         "attach": {
-            "description": "详情页点右下「前往」"
+            "description": "详情页点右下「前往」；失败进状态检查：有前往继续点，没有则点业火"
         },
         "recognition": "OCR",
         "expected": [
@@ -1026,7 +1100,7 @@
         "threshold": 0.45,
         "action": "Click",
         "post_delay": 1500,
-        "max_hit": 3,
+        "max_hit": 12,
         "next": [
             "号令_点开始匹配",
             "号令_已在匹配中",
@@ -1035,10 +1109,15 @@
         "timeout": 15000,
         "rate_limit": 400,
         "on_error": [
-            "号令_见业火焚身",
-            "号令_查找业火",
+            "[JumpBack]公共_关控制器弹窗",
+            "号令_前往失败查状态",
             "每日号令_结束失败"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：前往匹配[/color]"
+            ]
+        }
     },
     "号令_点开始匹配": {
         "attach": {
@@ -1066,9 +1145,15 @@
         "timeout": 20000,
         "rate_limit": 400,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_开始匹配后",
             "每日号令_结束失败"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：开始匹配[/color]"
+            ]
+        }
     },
     "号令_等复活机会": {
         "attach": {
@@ -1096,10 +1181,16 @@
         "timeout": 3600000,
         "rate_limit": 1000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_匹配续等",
             "号令_战斗后分支",
             "每日号令_结束失败"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：已进战斗，等待结束[/color]"
+            ]
+        }
     },
     "每日号令_已进战斗": {
         "attach": {
@@ -1134,6 +1225,7 @@
         "timeout": 3600000,
         "rate_limit": 1000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_等复活机会",
             "每日号令_结束失败"
         ]
@@ -1162,12 +1254,13 @@
         "timeout": 5000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "每日号令_结束失败"
         ]
     },
     "号令_等观战中": {
         "attach": {
-            "description": "右下观战中 → 点门形走退出确认"
+            "description": "观战中：先模板点门形，再继续/往生；仍无则盲点右上出门。禁止只软回入口死循环。"
         },
         "recognition": "OCR",
         "expected": [
@@ -1184,36 +1277,46 @@
         "action": "DoNothing",
         "post_delay": 300,
         "next": [
-            "号令_点门形"
+            "号令_点门形",
+            "号令_点继续",
+            "号令_点往生极乐",
+            "号令_观战盲点门形"
         ],
-        "timeout": 8000,
-        "rate_limit": 600,
+        "timeout": 12000,
+        "rate_limit": 400,
         "on_error": [
-            "号令_点继续"
-        ]
+            "号令_观战盲点门形",
+            "每日号令_结束失败"
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：观战退出[/color]"
+            ]
+        }
     },
     "号令_点门形": {
         "attach": {
-            "description": "模板点右上门形退出（用户裁切小图；旧大图点偏）"
+            "description": "观战/战斗右上出门形。模板在观战态常只有0.4~0.5，阈值勿高于0.55；失败由等观战中盲点坐标兜底。"
         },
         "recognition": "TemplateMatch",
         "template": "daily_order/exit_door.png",
         "roi": [
-            1140,
+            1100,
             0,
-            140,
-            70
+            180,
+            90
         ],
-        "threshold": 0.9,
+        "threshold": 0.55,
         "action": "Click",
         "post_delay": 1000,
-        "max_hit": 1,
+        "max_hit": 4,
         "next": [
             "号令_点退出确定"
         ],
-        "timeout": 20000,
+        "timeout": 8000,
         "rate_limit": 400,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_点继续",
             "每日号令_结束失败"
         ]
@@ -1230,6 +1333,7 @@
         "timeout": 15000,
         "rate_limit": 300,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_点往生极乐",
             "号令_点继续",
             "每日号令_结束失败"
@@ -1288,6 +1392,7 @@
         "timeout": 12000,
         "rate_limit": 300,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_退出点是OCR",
             "每日号令_结束失败"
         ]
@@ -1318,9 +1423,15 @@
         "timeout": 30000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_点继续",
             "每日号令_结束失败"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：结算往生极乐[/color]"
+            ]
+        }
     },
     "号令_点继续": {
         "attach": {
@@ -1332,12 +1443,12 @@
         ],
         "order_by": "Horizontal",
         "roi": [
-            700,
-            500,
-            580,
-            220
+            600,
+            400,
+            680,
+            320
         ],
-        "threshold": 0.3,
+        "threshold": 0.28,
         "action": "Click",
         "post_delay": 1200,
         "next": [
@@ -1346,6 +1457,7 @@
         "timeout": 25000,
         "rate_limit": 400,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_继续后等待",
             "每日号令_结束失败"
         ],
@@ -1376,10 +1488,16 @@
         "timeout": 25000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_大厅收工",
             "号令_点继续",
             "每日号令_结束失败"
-        ]
+        ],
+        "focus": {
+            "start": [
+                "[color:#7E9BB5]阶段：回大世界，再开号令[/color]"
+            ]
+        }
     },
     "号令_退出点是OCR": {
         "attach": {
@@ -1408,6 +1526,7 @@
         "timeout": 12000,
         "rate_limit": 300,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "每日号令_结束失败"
         ]
     },
@@ -1459,7 +1578,7 @@
     },
     "号令_在匹配大厅": {
         "attach": {
-            "description": "兼容：转大厅收工"
+            "description": "兼容：转大厅收工（先退匹配回主界面，再开号令查业火）"
         },
         "recognition": "OCR",
         "expected": [
@@ -1525,6 +1644,7 @@
         "timeout": 3600000,
         "rate_limit": 1000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_匹配续等",
             "号令_战斗后分支",
             "每日号令_结束失败"
@@ -1532,23 +1652,30 @@
     },
     "号令_战斗后分支": {
         "attach": {
-            "description": "复活后：右下观战中则点门形退出；也可能直接出继续"
+            "description": "复活后：右下观战中则点门形退出；也可能直接出继续/往生；若已落大厅或主界面则退回重开号令查业火"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
         "next": [
             "号令_等观战中",
-            "号令_点继续"
+            "号令_点继续",
+            "号令_点往生极乐",
+            "号令_大厅收工",
+            "号令_回大世界"
         ],
         "timeout": 600000,
         "rate_limit": 800,
         "on_error": [
-            "每日号令_结束失败"
+            "[JumpBack]公共_关控制器弹窗",
+            "号令_点继续",
+            "号令_大厅收工",
+            "号令_回大世界",
+            "每日号令"
         ]
     },
     "号令_继续后分支": {
         "attach": {
-            "description": "点完继续后判断：观战中 / 再继续 / 匹配大厅返回 / 主界面"
+            "description": "点完继续后判断：观战中 / 再继续 / 匹配大厅则退回主界面重开号令查业火 / 主界面"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
@@ -1561,10 +1688,11 @@
         "timeout": 30000,
         "rate_limit": 500,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "号令_点继续",
             "号令_大厅收工",
             "号令_回大世界",
-            "每日号令_结束失败"
+            "每日号令"
         ]
     },
     "号令_继续后等待": {
@@ -1622,6 +1750,7 @@
         ],
         "timeout": 3000,
         "on_error": [
+            "[JumpBack]公共_关控制器弹窗",
             "每日号令_结束失败"
         ]
     },
@@ -1678,7 +1807,7 @@
     },
     "号令_大厅收工": {
         "attach": {
-            "description": "出战斗后落在大厅：先退出匹配再返回主界面，然后重开号令"
+            "description": "出战斗后落在大厅：先退出匹配再返回主界面，然后重开号令查业火是否完成（不可直接再点开始匹配）"
         },
         "recognition": "OCR",
         "expected": [
@@ -1705,6 +1834,161 @@
         "rate_limit": 300,
         "on_error": [
             "号令_回大世界"
+        ]
+    },
+    "号令_查到开始匹配": {
+        "attach": {
+            "description": "前往失败查状态：短认「开始匹配」"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "开始匹配",
+            "始匹配",
+            "开始匹"
+        ],
+        "roi": [
+            780,
+            560,
+            500,
+            160
+        ],
+        "threshold": 0.4,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "号令_点开始匹配"
+        ],
+        "timeout": 1500,
+        "rate_limit": 200,
+        "on_error": []
+    },
+    "号令_查到匹配中": {
+        "attach": {
+            "description": "前往失败查状态：短认「匹配中/退出匹配」"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "匹配中",
+            "退出匹配"
+        ],
+        "roi": [
+            650,
+            440,
+            630,
+            280
+        ],
+        "threshold": 0.35,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "号令_开始匹配后"
+        ],
+        "timeout": 1500,
+        "rate_limit": 200,
+        "on_error": []
+    },
+    "号令_有前往续点": {
+        "attach": {
+            "description": "状态检查：仍有「前往」则继续点；短 timeout 以便没有时立刻改点业火"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "前往",
+            "前 往"
+        ],
+        "roi": [
+            900,
+            560,
+            380,
+            160
+        ],
+        "threshold": 0.4,
+        "action": "Click",
+        "post_delay": 1500,
+        "max_hit": 12,
+        "next": [
+            "号令_点开始匹配",
+            "号令_已在匹配中",
+            "号令_开始匹配后"
+        ],
+        "timeout": 2500,
+        "rate_limit": 300,
+        "on_error": []
+    },
+    "号令_前往失败查状态": {
+        "attach": {
+            "description": "点前往失败后查状态：已匹配则接着走；有前往继续点；没有前往则点业火；再不行回入口查找当前界面"
+        },
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "号令_查到开始匹配",
+            "号令_查到匹配中",
+            "号令_有前往续点",
+            "号令_见业火焚身"
+        ],
+        "timeout": 12000,
+        "rate_limit": 300,
+        "on_error": [
+            "每日号令"
+        ]
+    },
+    "号令_无刷新收工": {
+        "attach": {
+            "description": "号令页左上标题仍在，且刷新建认不到 → 视为 6 个都没有刷新，正常结束；若不在号令页则回入口重定位，避免误结束"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "号令",
+            "^号$"
+        ],
+        "order_by": "Expected",
+        "roi": [
+            90,
+            0,
+            90,
+            60
+        ],
+        "threshold": 0.7,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "每日号令_结束"
+        ],
+        "timeout": 2000,
+        "rate_limit": 300,
+        "on_error": [
+            "每日号令"
+        ],
+        "focus": {
+            "succeeded": [
+                "[color:green]阶段完成：号令页无刷新[/color]"
+            ]
+        }
+    },
+    "号令_观战盲点门形": {
+        "attach": {
+            "description": "门形模板分不够时，按右上固定坐标点击出门（与买药返回点接近）。"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1184,
+            33
+        ],
+        "post_delay": 1000,
+        "max_hit": 3,
+        "next": [
+            "号令_点退出确定",
+            "号令_点往生极乐",
+            "号令_点继续"
+        ],
+        "timeout": 4000,
+        "rate_limit": 400,
+        "on_error": [
+            "号令_点退出确定",
+            "号令_点继续",
+            "每日号令_结束失败"
         ]
     }
 }
