@@ -1,9 +1,14 @@
 {
     "无限集英": {
         "attach": {
-            "description": "主入口节点，持续循环寻找"
+            "description": "入口。读齿轮秒数×1000，写入集英与集英_OCR 的 post_delay，再进循环"
         },
-        "action": "DoNothing",
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "集英_应用点后等待",
+        "custom_action_param": {
+            "seconds": 11
+        },
         "next": [
             "[JumpBack]无限集英1"
         ],
@@ -29,7 +34,13 @@
     },
     "无限太极": {
         "attach": {
-            "description": "主入口节点，持续循环寻找"
+            "description": "入口。读齿轮秒数×1000，写入太极的 post_delay，再进循环"
+        },
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "太极_应用点后等待",
+        "custom_action_param": {
+            "seconds": 20
         },
         "next": [
             "[JumpBack]太极",
@@ -49,7 +60,7 @@
     },
     "集英": {
         "attach": {
-            "description": "模板点灵赋·集英图标+文字。户外白字 OCR 在 MFA 常 all 空，天工菜单字不受影响"
+            "description": "模板点灵赋·集英图标+文字。户外白字 OCR 在 MFA 常 all 空，天工菜单字不受影响。post_delay 默认 11000，由入口按秒×1000 覆盖"
         },
         "action": "Click",
         "recognition": "TemplateMatch",
@@ -67,7 +78,7 @@
     },
     "集英_OCR": {
         "attach": {
-            "description": "OCR 备用。正文常被拆成灵赋 / ·集英 / 赋·集英"
+            "description": "OCR 备用。正文常被拆成灵赋 / ·集英 / 赋·集英。post_delay 默认 11000，由入口按秒×1000 覆盖"
         },
         "action": "Click",
         "recognition": "OCR",
@@ -152,7 +163,7 @@
     },
     "太极": {
         "attach": {
-            "description": "太极"
+            "description": "太极。post_delay 默认 20000，由入口按秒×1000 覆盖"
         },
         "action": "Click",
         "recognition": "OCR",
