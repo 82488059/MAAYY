@@ -39,6 +39,7 @@ def publish_mfa(mfa_dir: Path) -> None:
         "alchemy_action.py",
         "tiangong_action.py",
         "moneybag_action.py",
+        "yysls_action.py",
         "debug_action.py",
         "my_action.py",
         "my_reco.py",
@@ -76,7 +77,7 @@ def publish_mfa(mfa_dir: Path) -> None:
     print(f"  agent/ ({agent_files})")
     print("任务:", [t["name"] for t in interface.get("task", [])])
     print("\n请重启 MFAAvalonia.exe 以重载 interface.json，资源选「官服」后连接开始。")
-    print("跑自动炼药/自动买钱/一条龙前需: python -m pip install maafw==5.8.1")
+    print("跑自动炼药/自动买钱/一条龙/无限集英/无限太极前需: python -m pip install maafw==5.8.1")
 
 
 if __name__ == "__main__":
