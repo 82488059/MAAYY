@@ -1,12 +1,12 @@
-// 外观上架 V1：主菜单 → 商店（不经不肝）→ 交易 → 出售道具。
-// 有可寄售道具 = 可寄售区第一格对不上空格模板 appear/可寄售_空格.png（不 OCR 道具名）。
-// 有空位（左侧「空闲」、不是 6/6）且第一格非空：点第一格，反复点价格旁的「−」直到不能再降，再点「寄售」。
-// 到底：减号变灰（appear/价格减号_灰.png），或点完后价格数字与上一次 OCR 相同。空仓或无空位不点。单次上限 6。
-// 空格模板与灰色减号图待补。价格区 ROI 先盖右下，截图到了再收。
+// 外观上架 V2：主菜单 → 商店（不经不肝）→ 交易 → 出售道具。
+// 有可寄售道具 = 可寄售区第一格对不上空格模板 appear/可寄售_空格.png。
+// 有空位且第一格非空：点第一格 → 长按减号 (1028,579) → toast「价格已达最小」到底 → 点寄售 (1161,678) → 确认「上架成功」(1082,474) → 回分流循环。
+// 到底主判定：toast ROI [450,80,380,65] OCR「价格已达最小」；灰减号模板仅辅助。禁止同价 OCR / 固定金额兜底。长按最多 8 次。
+// 空仓 / 满仓 / 循环耗尽：先回主界面（对齐存放_退出循环）再成功。空格与灰减号图待补。
 {
     "外观上架": {
         "attach": {
-            "description": "入口。主界面直点主菜单里的「商店」（不走不肝），再点顶栏「交易」→「出售道具」。已在更后面的页面则从该页接着走。成功停在出售页，不进入上架占位"
+            "description": "入口。主菜单直点「商店」（不走不肝）→顶栏「交易」→「出售道具」。有空位且第一格有货则长按减号到底→寄售→确认，循环至无货或满仓；结束前回主界面。已在更后面的页面则从该页接着走"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
@@ -334,7 +334,7 @@
     },
     "外观_分流可寄售": {
         "attach": {
-            "description": "已在出售页。无货（第一格是空模板，或右侧「暂无可寄售道具」）或无空位（6/6、没有「空闲」）直接成功。有空位且第一格非空才点第一格。单次上限 6。空格模板见 appear/可寄售_空格.png"
+            "description": "已在出售页。无货（第一格空模板，或右侧「暂无可寄售道具」）或无空位（6/6、没有「空闲」）→回主界面再成功。有空位且第一格非空才点第一格。外观最多同时上架 6 个。空格模板见 appear/可寄售_空格.png"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
@@ -347,12 +347,12 @@
         "timeout": 2000,
         "rate_limit": 350,
         "on_error": [
-            "外观_结束"
+            "外观_回主界面"
         ]
     },
     "外观_见无可寄售": {
         "attach": {
-            "description": "右侧正文是「暂无可寄售道具」：空仓，第一格也是空的。直接成功，不点。这是文案快路径；是否有货仍以第一格空模板为准"
+            "description": "右侧正文是「暂无可寄售道具」：空仓。回主界面再成功，不点。这是文案快路径；是否有货仍以第一格空模板为准"
         },
         "recognition": "OCR",
         "expected": [
@@ -371,12 +371,12 @@
         "action": "DoNothing",
         "post_delay": 200,
         "next": [
-            "外观_结束"
+            "外观_回主界面"
         ]
     },
     "外观_见已满": {
         "attach": {
-            "description": "左侧标题已是 6/6，没有空位。直接成功，不点可寄售。不要把 0/6 认成 6/6"
+            "description": "左侧标题已是 6/6，没有空位。回主界面再成功，不点可寄售。不要把 0/6 认成 6/6"
         },
         "recognition": "OCR",
         "expected": [
@@ -393,7 +393,7 @@
         "action": "DoNothing",
         "post_delay": 200,
         "next": [
-            "外观_结束"
+            "外观_回主界面"
         ]
     },
     "外观_见空闲": {
@@ -416,12 +416,12 @@
         ],
         "timeout": 2000,
         "on_error": [
-            "外观_结束"
+            "外观_回主界面"
         ]
     },
     "外观_第一格是空": {
         "attach": {
-            "description": "可寄售区第一格对得上空格模板：没有可寄售道具。直接成功，不点。模板 assets/resource/image/appear/可寄售_空格.png，只裁一个空格子。ROI 只包第一格，不要扫到后面的空格"
+            "description": "可寄售区第一格对得上空格模板：没有可寄售道具。回主界面再成功，不点。模板 assets/resource/image/appear/可寄售_空格.png，只裁一个空格子。ROI 只包第一格"
         },
         "recognition": "TemplateMatch",
         "template": "appear/可寄售_空格.png",
@@ -435,16 +435,16 @@
         "action": "DoNothing",
         "post_delay": 200,
         "next": [
-            "外观_结束"
+            "外观_回主界面"
         ],
         "timeout": 1500,
         "on_error": [
-            "外观_结束"
+            "外观_回主界面"
         ]
     },
     "外观_第一格非空": {
         "attach": {
-            "description": "同一 ROI、同一空格模板取反：第一格对不上空模板，就是有可寄售道具。不 OCR 道具名。命中后点第一格中心；模板仍对得上则不点"
+            "description": "同一 ROI、同一空格模板取反：第一格对不上空模板，就是有可寄售道具。不 OCR 道具名。命中后点第一格中心；模板仍对得上则回主界面"
         },
         "recognition": "TemplateMatch",
         "template": "appear/可寄售_空格.png",
@@ -463,12 +463,12 @@
         ],
         "timeout": 1500,
         "on_error": [
-            "外观_结束"
+            "外观_回主界面"
         ]
     },
     "外观_点第一个可寄售": {
         "attach": {
-            "description": "点可寄售区第一格中心 (1024, 208)，即空模板 ROI [988, 172, 72, 72] 的中心。只点一次。点完等右下「价格」和「寄售」，再降价。调用前须已确认第一格非空且左侧有空闲。面板没出来则停住，不点减号、不点寄售"
+            "description": "点可寄售区第一格中心 (1024, 208)。最多 6 次（对应同时上架上限）。点完等右下「价格」和「寄售」，再长按减号。面板没出来则回主界面"
         },
         "recognition": "DirectHit",
         "action": "Click",
@@ -477,19 +477,19 @@
             208
         ],
         "post_delay": 900,
-        "max_hit": 1,
+        "max_hit": 6,
         "next": [
             "外观_认上架面板"
         ],
         "timeout": 3000,
         "rate_limit": 400,
         "on_error": [
-            "外观_结束"
+            "外观_回主界面"
         ]
     },
     "外观_认上架面板": {
         "attach": {
-            "description": "右下同时有「价格」和「寄售」才开始降价。^寄售$ 对不上标题「可寄售」。只认不点。认不到则上一个节点停住成功，不降价、不点寄售。ROI 待截图再收"
+            "description": "右下同时有「价格」和「寄售」才开始降价。^寄售$ 对不上标题「可寄售」。只认不点。认不到则回主界面，不长按、不点寄售"
         },
         "recognition": "And",
         "all_of": [
@@ -527,34 +527,23 @@
         "action": "DoNothing",
         "post_delay": 200,
         "next": [
-            "外观_降价重置"
-        ]
-    },
-    "外观_降价重置": {
-        "attach": {
-            "description": "Custom：清掉 Agent 里上一轮的价格读数，再开始降。需 Agent。清不掉则失败，不点减号、不点寄售"
-        },
-        "recognition": "DirectHit",
-        "action": "Custom",
-        "custom_action": "外观_降价重置",
-        "post_delay": 100,
-        "next": [
             "外观_降价一轮"
         ],
-        "timeout": 4000,
+        "timeout": 3000,
         "on_error": [
-            "外观_降价失败"
+            "外观_回主界面"
         ]
     },
     "外观_降价一轮": {
         "attach": {
-            "description": "先认灰色减号（到底就不点），否则让 Agent 比价。比价节点是直接命中，灰色模板对不上会马上进比对。空仓和无空位不会进这里"
+            "description": "先认 toast「价格已达最小」或灰色减号（到底就去点寄售）；否则长按减号。主路径是 toast，灰减号仅辅助。禁止同价 OCR / 固定金额兜底"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
         "next": [
+            "外观_认到底toast",
             "外观_减号已灰",
-            "外观_降价一步"
+            "外观_长按减号"
         ],
         "timeout": 1500,
         "rate_limit": 300,
@@ -562,125 +551,100 @@
             "外观_降价失败"
         ]
     },
-    "外观_减号已灰": {
+    "外观_认到底toast": {
         "attach": {
-            "description": "价格旁的减号变灰、不可再点：已经到底，去点寄售。模板 assets/resource/image/appear/价格减号_灰.png，只裁灰色减号。图还没放进来时这一步对不上，改由价格连续两次相同来判断。ROI 与价格面板相同，待截图再收"
+            "description": "顶部 toast OCR「价格已达最小」：价格已到底，去点寄售。ROI [450,80,380,65]（舟3 已验证）。主判定，不靠同价"
         },
-        "recognition": "TemplateMatch",
-        "template": "appear/价格减号_灰.png",
-        "roi": [
-            640,
-            420,
-            620,
-            280
+        "recognition": "OCR",
+        "expected": [
+            "价格已达最小",
+            "已达最小"
         ],
-        "threshold": 0.8,
+        "order_by": "Expected",
+        "roi": [
+            450,
+            80,
+            380,
+            65
+        ],
+        "threshold": 0.35,
         "action": "DoNothing",
-        "post_delay": 200,
+        "post_delay": 150,
         "next": [
             "外观_点寄售"
         ],
         "timeout": 800
     },
-    "外观_降价一步": {
+    "外观_减号已灰": {
         "attach": {
-            "description": "Custom：OCR 价格。与上一次成功读数相同（点过减号之后数字不变，即连续两次相同）则去点寄售。还在降就记下价格，交给外观_点减号。读不到数字不当成相同。超过 max_clicks 仍在降则失败，不点寄售。需 Agent"
+            "description": "价格旁的减号变灰、不可再点：辅助到底判定，去点寄售。模板 appear/价格减号_灰.png。图未入库时对不上，主路径仍靠 toast。ROI 盖减号附近"
+        },
+        "recognition": "TemplateMatch",
+        "template": "appear/价格减号_灰.png",
+        "roi": [
+            980,
+            540,
+            100,
+            80
+        ],
+        "threshold": 0.8,
+        "action": "DoNothing",
+        "post_delay": 150,
+        "next": [
+            "外观_点寄售"
+        ],
+        "timeout": 800
+    },
+    "外观_长按减号": {
+        "attach": {
+            "description": "长按价格旁减号 (1028, 579)。Swipe begin=end，duration 1800ms（对齐 alchemy Swipe+duration）。最多 8 次；每次后短等再回降价一轮认 toast。超限失败，不点寄售"
         },
         "recognition": "DirectHit",
-        "action": "Custom",
-        "custom_action": "外观_降价一步",
-        "custom_action_param": {
-            "max_clicks": 40
-        },
-        "post_delay": 100,
+        "action": "Swipe",
+        "begin": [
+            1028,
+            579
+        ],
+        "end": [
+            1028,
+            579
+        ],
+        "duration": 1800,
+        "end_hold": 50,
+        "post_delay": 400,
+        "max_hit": 8,
         "next": [
-            "外观_点减号"
+            "外观_降价一轮"
         ],
         "timeout": 4000,
-        "on_error": [
-            "外观_降价失败"
-        ]
-    },
-    "外观_读价格": {
-        "attach": {
-            "description": "仅供自定义动作。右下面板里的价格数字（可含千分位）。不要放进 next"
-        },
-        "recognition": "OCR",
-        "expected": [
-            "\\d[\\d,，]*"
-        ],
-        "roi": [
-            640,
-            420,
-            620,
-            280
-        ],
-        "threshold": 0.3
-    },
-    "外观_认价格字": {
-        "attach": {
-            "description": "仅供自定义动作。用来找「价格」二字的位置，好挑它旁边的数字。不要放进 next"
-        },
-        "recognition": "OCR",
-        "expected": [
-            "^价格$",
-            "^价格"
-        ],
-        "order_by": "Expected",
-        "roi": [
-            640,
-            420,
-            620,
-            280
-        ],
-        "threshold": 0.35
-    },
-    "外观_点减号": {
-        "attach": {
-            "description": "点价格旁减号字形（整框只有 −／-）。最多 40 次，与外观_降价一步的 max_clicks 一致。认不到字形就改点价格数字左侧，不点寄售"
-        },
-        "recognition": "OCR",
-        "expected": [
-            "^[−－\\-—–]$"
-        ],
-        "roi": [
-            640,
-            420,
-            620,
-            280
-        ],
-        "threshold": 0.35,
-        "action": "Click",
-        "post_delay": 350,
-        "max_hit": 40,
-        "next": [
-            "外观_降价一轮"
-        ],
-        "timeout": 1200,
-        "on_error": [
-            "外观_点价格左侧"
-        ]
-    },
-    "外观_点价格左侧": {
-        "attach": {
-            "description": "减号字形没认到。Custom 点最近一次价格数字框的左侧（约 32 像素），当作价格旁的减号。点出面板外则失败，不点寄售。需 Agent"
-        },
-        "recognition": "DirectHit",
-        "action": "Custom",
-        "custom_action": "外观_点价格左侧",
-        "post_delay": 350,
-        "max_hit": 40,
-        "next": [
-            "外观_降价一轮"
-        ],
-        "timeout": 3000,
+        "rate_limit": 200,
         "on_error": [
             "外观_降价失败"
         ]
     },
     "外观_点寄售": {
         "attach": {
-            "description": "价格已经不能再降。点右下「寄售」一次。^寄售$ 对不上「可寄售」。不改价。点不到则失败，不再点减号"
+            "description": "价格已到底。优先实测坐标点寄售 (1161, 678)。点完等「上架成功」弹窗。点不到再试 OCR"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1161,
+            678
+        ],
+        "post_delay": 600,
+        "max_hit": 1,
+        "next": [
+            "外观_认上架成功"
+        ],
+        "timeout": 3000,
+        "on_error": [
+            "外观_点寄售OCR"
+        ]
+    },
+    "外观_点寄售OCR": {
+        "attach": {
+            "description": "坐标没点到时 OCR ^寄售$ 再点一次。对不上标题「可寄售」。仍点不到则失败，不再长按"
         },
         "recognition": "OCR",
         "expected": [
@@ -696,19 +660,145 @@
         ],
         "threshold": 0.4,
         "action": "Click",
-        "post_delay": 500,
+        "post_delay": 600,
         "max_hit": 1,
         "next": [
-            "外观_结束"
+            "外观_认上架成功"
         ],
         "timeout": 3000,
         "on_error": [
             "外观_降价失败"
         ]
     },
+    "外观_认上架成功": {
+        "attach": {
+            "description": "弹窗 OCR「上架成功」。ROI 屏幕中部偏上 [400,200,480,280]。认到后点确认"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "上架成功"
+        ],
+        "order_by": "Expected",
+        "roi": [
+            400,
+            200,
+            480,
+            280
+        ],
+        "threshold": 0.35,
+        "action": "DoNothing",
+        "post_delay": 200,
+        "next": [
+            "外观_点确认"
+        ],
+        "timeout": 4000,
+        "rate_limit": 400,
+        "on_error": [
+            "外观_降价失败"
+        ]
+    },
+    "外观_点确认": {
+        "attach": {
+            "description": "上架成功弹窗点确认 (1082, 474)。确认后回到分流：仍有空位且有货则继续点第一格，直到满或没货"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1082,
+            474
+        ],
+        "post_delay": 800,
+        "max_hit": 1,
+        "next": [
+            "外观_分流可寄售"
+        ],
+        "timeout": 3000,
+        "on_error": [
+            "外观_分流可寄售"
+        ]
+    },
+    "外观_回主界面": {
+        "attach": {
+            "description": "对齐存放_退出循环：右上已是主菜单图标则停；否则点返回（模板或坐标 (1188, 32)），循环几次直到回主界面"
+        },
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": [
+            "外观_已在主界面",
+            "外观_回主界面点返回"
+        ],
+        "timeout": 1500,
+        "rate_limit": 350,
+        "on_error": [
+            "外观_回主界面点返回坐标",
+            "外观_结束"
+        ]
+    },
+    "外观_已在主界面": {
+        "attach": {
+            "description": "认出主菜单图标（storage/主菜单.png，ROI [1080,0,200,90]）说明已回主界面。只识别不点，再走外观_结束"
+        },
+        "recognition": "TemplateMatch",
+        "template": "storage/主菜单.png",
+        "roi": [
+            1080,
+            0,
+            200,
+            90
+        ],
+        "threshold": 0.85,
+        "action": "DoNothing",
+        "next": [
+            "外观_结束"
+        ]
+    },
+    "外观_回主界面点返回": {
+        "attach": {
+            "description": "尚未回主界面：点右上返回箭头 medicine/返回.png。最多 6 次，再认主菜单"
+        },
+        "recognition": "TemplateMatch",
+        "template": "medicine/返回.png",
+        "roi": [
+            1125,
+            0,
+            145,
+            68
+        ],
+        "threshold": 0.8,
+        "action": "Click",
+        "post_delay": 450,
+        "max_hit": 6,
+        "next": [
+            "外观_回主界面"
+        ],
+        "timeout": 2500,
+        "on_error": [
+            "外观_回主界面点返回坐标"
+        ]
+    },
+    "外观_回主界面点返回坐标": {
+        "attach": {
+            "description": "返回模板未命中时盲点 (1188, 32)，再认主菜单。最多 4 次"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1188,
+            32
+        ],
+        "post_delay": 450,
+        "max_hit": 4,
+        "next": [
+            "外观_回主界面"
+        ],
+        "timeout": 2000,
+        "on_error": [
+            "外观_结束"
+        ]
+    },
     "外观_结束": {
         "attach": {
-            "description": "成功收工。无可寄售、无空位，或已把第一格降到最低并点过「寄售」。不返回主界面。本版只上架第一格，不把 6 格点满"
+            "description": "成功收工。已回主界面（或返回次数用尽仍尽量收场）。空仓、满仓、或循环上架完毕后都先回主界面再结束"
         },
         "recognition": "DirectHit",
         "action": "DoNothing",
@@ -716,7 +806,7 @@
     },
     "外观_失败收场": {
         "attach": {
-            "description": "导航失败。右上若有返回箭头（medicine/返回.png，与商店/炼药相同）则点一次，然后失败收工。不循环点返回，不点上架"
+            "description": "导航失败。右上若有返回箭头（medicine/返回.png）则点一次，然后失败收工。不循环点返回，不点上架"
         },
         "recognition": "TemplateMatch",
         "template": "medicine/返回.png",
@@ -737,7 +827,7 @@
     },
     "外观_结束失败": {
         "attach": {
-            "description": "没进到出售页。打印失败节点后任务失败。不点减号、不点寄售"
+            "description": "没进到出售页。打印失败节点后任务失败。不点减号、不点寄售。需 Agent（打印失败节点）"
         },
         "recognition": "DirectHit",
         "action": "Custom",
@@ -752,7 +842,7 @@
     },
     "外观_降价失败": {
         "attach": {
-            "description": "降价没到底，或到底了却没点到寄售。任务失败。不盲点寄售，不购买，不下架"
+            "description": "长按减号超限仍无 toast「价格已达最小」，或到底了却没点到寄售/确认。任务失败。不盲点寄售。需 Agent（打印失败节点）"
         },
         "recognition": "DirectHit",
         "action": "Custom",
