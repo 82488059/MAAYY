@@ -39,11 +39,19 @@
         },
         {
             "name": "无限集英",
-            "entry": "无限集英"
+            "entry": "无限集英",
+            "description": "反复点击「集英」，并处理取消和点击空白关闭。齿轮里填点后等待的秒数，Agent 换算成毫秒。需要 Agent。",
+            "option": [
+                "集英点后等待"
+            ]
         },
         {
             "name": "无限太极",
-            "entry": "无限太极"
+            "entry": "无限太极",
+            "description": "反复点击「太极」，找不到就等 10 秒。齿轮里填点后等待的秒数，Agent 换算成毫秒。需要 Agent。",
+            "option": [
+                "太极点后等待"
+            ]
         },
         {
             "name": "自动买药",
@@ -391,6 +399,52 @@
                     }
                 }
             ]
+        },
+        "集英点后等待": {
+            "type": "input",
+            "label": "点后等待（秒）",
+            "description": "点击「集英」之后、下一轮识别之前等待多少秒。填正整数。Agent 把秒乘 1000，写入节点「集英」和「集英_OCR」的 post_delay（毫秒）。默认 11 秒。",
+            "inputs": [
+                {
+                    "name": "集英点后等待秒",
+                    "label": "等待（秒）",
+                    "description": "正整数，单位秒。留空或不是正整数时不能开始；不改则用默认 11 秒。",
+                    "default": "11",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入正整数秒"
+                }
+            ],
+            "pipeline_override": {
+                "无限集英": {
+                    "custom_action_param": {
+                        "seconds": "{集英点后等待秒}"
+                    }
+                }
+            }
+        },
+        "太极点后等待": {
+            "type": "input",
+            "label": "点后等待（秒）",
+            "description": "点击「太极」之后、下一轮识别之前等待多少秒。填正整数。Agent 把秒乘 1000，写入节点「太极」的 post_delay（毫秒）。默认 20 秒。",
+            "inputs": [
+                {
+                    "name": "太极点后等待秒",
+                    "label": "等待（秒）",
+                    "description": "正整数，单位秒。留空或不是正整数时不能开始；不改则用默认 20 秒。",
+                    "default": "20",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]*$",
+                    "pattern_msg": "请输入正整数秒"
+                }
+            ],
+            "pipeline_override": {
+                "无限太极": {
+                    "custom_action_param": {
+                        "seconds": "{太极点后等待秒}"
+                    }
+                }
+            }
         }
     }
 }
