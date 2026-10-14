@@ -17,7 +17,7 @@ from configure import configure_ocr_model
 ROOT = Path(__file__).parent.parent.resolve()
 ASSETS = ROOT / "assets"
 AGENT = ROOT / "agent"
-DEFAULT_MFA = Path("E:/repos/MFAAvalonia")
+DEFAULT_MFA = Path("E:/repos/MAAJN/MFAAvalonia")
 
 
 def publish_mfa(mfa_dir: Path) -> None:
@@ -39,6 +39,9 @@ def publish_mfa(mfa_dir: Path) -> None:
         "alchemy_action.py",
         "tiangong_action.py",
         "moneybag_action.py",
+        "daily_order_action.py",
+        "yysls_action.py",
+        "yitiaolong_action.py",
         "debug_action.py",
         "my_action.py",
         "my_reco.py",

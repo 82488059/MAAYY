@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 
 from maa.agent.agent_server import AgentServer
 from maa.toolkit import Toolkit
@@ -8,6 +8,9 @@ import my_reco
 import alchemy_action
 import tiangong_action
 import moneybag_action
+import daily_order_action
+import yysls_action
+import yitiaolong_action
 import debug_action
 
 
@@ -18,7 +21,7 @@ def main():
         print("Usage: python main.py <socket_id>")
         print("socket_id is provided by AgentIdentifier.")
         sys.exit(1)
-        
+
     socket_id = sys.argv[-1]
 
     AgentServer.start_up(socket_id)
