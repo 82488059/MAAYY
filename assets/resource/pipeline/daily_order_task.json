@@ -1,11 +1,14 @@
 {
     "每日号令": {
         "attach": {
-            "description": "入口。先识别当前界面落在哪一步再接着跑。大厅闲置（开始匹配）走收工回主再开号令查业火；仅号令页确认无刷新角标才结束。开始匹配只在「前往」之后点。"
+            "description": "入口。先识别当前界面落在哪一步再接着跑。退出确认弹窗（确认/确定/是）必须排在观战/继续之前，否则会点到背后灰色继续。大厅闲置走收工回主；仅号令页无刷新角标才结束。"
         },
         "action": "DoNothing",
         "next": [
             "[JumpBack]公共_关控制器弹窗",
+            "号令_退出点确认",
+            "号令_退出点确定",
+            "号令_退出点是",
             "号令_等观战中",
             "号令_点继续",
             "号令_点往生极乐",
@@ -1323,25 +1326,59 @@
     },
     "号令_点退出确定": {
         "attach": {
-            "description": "退出确认：观战中弹窗点「确定」；对局进行中弹窗点「是」。由 next 级联两种"
+            "description": "退出确认右钮三种文案都认：确认（对局进行中常见）/ 确定（观战）/ 是（模板+OCR）。弹窗点门后几乎立刻出现，timeout 约 5 秒；认不到再盲点右钮"
         },
         "action": "DoNothing",
         "next": [
+            "号令_退出点确认",
             "号令_退出点确定",
             "号令_退出点是"
         ],
-        "timeout": 15000,
-        "rate_limit": 300,
+        "timeout": 5000,
+        "rate_limit": 250,
         "on_error": [
             "[JumpBack]公共_关控制器弹窗",
+            "号令_退出盲点确定",
             "号令_点往生极乐",
             "号令_点继续",
             "每日号令_结束失败"
         ]
     },
+    "号令_退出点确认": {
+        "attach": {
+            "description": "对局进行中退出确认：右下金色「确认」（舟2 实测钮约 963–1099×460–498）。文案「确定退出吗」在按钮上方，ROI 只盖右钮勿扫正文"
+        },
+        "recognition": "OCR",
+        "expected": [
+            "^确认$",
+            "确认"
+        ],
+        "roi": [
+            900,
+            445,
+            250,
+            70
+        ],
+        "threshold": 0.35,
+        "action": "Click",
+        "post_delay": 1000,
+        "max_hit": 1,
+        "next": [
+            "号令_点往生极乐",
+            "号令_点继续"
+        ],
+        "timeout": 8000,
+        "rate_limit": 300,
+        "on_error": [
+            "号令_点往生极乐",
+            "号令_点继续",
+            "每日号令_结束失败"
+        ],
+        "order_by": "Expected"
+    },
     "号令_退出点确定": {
         "attach": {
-            "description": "观战中退出确认：点按钮行「确定」，ROI 避开上方文案里的确定"
+            "description": "观战中退出确认：点按钮行「确定」。ROI 压到按钮带，避开正文「确定退出吗」"
         },
         "recognition": "OCR",
         "expected": [
@@ -1349,51 +1386,54 @@
             "确定"
         ],
         "roi": [
-            500,
-            430,
-            600,
-            120
+            700,
+            445,
+            450,
+            70
         ],
-        "threshold": 0.5,
+        "threshold": 0.4,
         "action": "Click",
-        "post_delay": 1500,
+        "post_delay": 1000,
         "max_hit": 1,
         "next": [
             "号令_点往生极乐",
             "号令_点继续"
         ],
-        "timeout": 12000,
+        "timeout": 8000,
         "rate_limit": 300,
         "on_error": [
-            "号令_退出点是"
+            "号令_点往生极乐",
+            "号令_点继续",
+            "每日号令_结束失败"
         ],
         "order_by": "Expected"
     },
     "号令_退出点是": {
         "attach": {
-            "description": "对局进行中退出确认：模板点金色「是」按钮（OCR 易点到文案）"
+            "description": "对局进行中退出确认：模板点金色「是」按钮（OCR 易点到文案）。exit_yes 仅金色条，阈值勿高于 0.7；ROI 对齐右钮带"
         },
         "recognition": "TemplateMatch",
         "template": "daily_order/exit_yes.png",
         "roi": [
-            700,
-            420,
-            520,
-            140
+            900,
+            440,
+            260,
+            80
         ],
-        "threshold": 0.85,
+        "threshold": 0.65,
         "action": "Click",
-        "post_delay": 1500,
+        "post_delay": 1000,
         "max_hit": 1,
         "next": [
             "号令_点往生极乐",
             "号令_点继续"
         ],
-        "timeout": 12000,
+        "timeout": 8000,
         "rate_limit": 300,
         "on_error": [
             "[JumpBack]公共_关控制器弹窗",
             "号令_退出点是OCR",
+            "号令_退出盲点确定",
             "每日号令_结束失败"
         ]
     },
@@ -1501,7 +1541,7 @@
     },
     "号令_退出点是OCR": {
         "attach": {
-            "description": "模板未命中时，仅在按钮行 OCR「是」"
+            "description": "模板未命中时，仅在右钮带 OCR「是」；短 timeout，仍无则盲点右钮"
         },
         "recognition": "OCR",
         "expected": [
@@ -1510,23 +1550,48 @@
         ],
         "order_by": "Expected",
         "roi": [
-            700,
-            430,
-            500,
-            120
+            900,
+            445,
+            250,
+            70
         ],
-        "threshold": 0.55,
+        "threshold": 0.45,
         "action": "Click",
-        "post_delay": 1500,
+        "post_delay": 1000,
         "max_hit": 1,
         "next": [
             "号令_点往生极乐",
             "号令_点继续"
         ],
-        "timeout": 12000,
-        "rate_limit": 300,
+        "timeout": 3000,
+        "rate_limit": 250,
         "on_error": [
             "[JumpBack]公共_关控制器弹窗",
+            "号令_退出盲点确定",
+            "每日号令_结束失败"
+        ]
+    },
+    "号令_退出盲点确定": {
+        "attach": {
+            "description": "退出确认 OCR/模板都未命中时，点右钮中心。舟2「确认」金色实测中心约 (1028,478)；旧 (920,485) 落在灰底点不中"
+        },
+        "recognition": "DirectHit",
+        "action": "Click",
+        "target": [
+            1028,
+            478
+        ],
+        "post_delay": 1000,
+        "max_hit": 2,
+        "next": [
+            "号令_点往生极乐",
+            "号令_点继续"
+        ],
+        "timeout": 4000,
+        "rate_limit": 300,
+        "on_error": [
+            "号令_点往生极乐",
+            "号令_点继续",
             "每日号令_结束失败"
         ]
     },
